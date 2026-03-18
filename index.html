@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="バナー広告を画面に表示しながら遊ぶ無料Webゲームです。広告を見ている時間を時計で可視化します。">
-  <title>広告ゲーム｜バナー広告を見て時間を記録しよう</title>
+  <meta name="description" content="バナー広告を画面に表示しながら遊ぶ無料Webゲームです。広告を見てKKKを貯めてフレームをカスタマイズしよう！">
+  <title>広告ゲーム｜バナー広告を見てKKKを貯めよう</title>
   <!-- AdSense審査通過後にコメントを外してIDを書き換える
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
   -->
@@ -34,7 +34,6 @@
     .sw-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform 0.2s;pointer-events:none;}
     .sw input:checked~.sw-thumb{transform:translateX(16px);}
 
-    /* カウント状態バッジ */
     .status-badge{display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:12px;}
     .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background 0.3s;}
     .status-dot.counting{background:var(--green);}
@@ -49,24 +48,73 @@
     #clock-canvas{width:200px;height:200px;}
     .digital-time{font-family:'DM Mono',monospace;font-size:32px;font-weight:500;letter-spacing:0.04em;color:var(--text);text-align:center;}
     .digital-date{font-size:12px;color:var(--text3);text-align:center;margin-top:2px;}
-    .legend{display:flex;gap:16px;font-size:11px;color:var(--text2);margin-top:4px;}
+    .legend{display:flex;gap:14px;font-size:11px;color:var(--text2);margin-top:4px;flex-wrap:wrap;justify-content:center;}
     .leg{display:flex;align-items:center;gap:5px;}
     .leg-dot{width:9px;height:9px;border-radius:50%;}
 
-    .adsense-wrap{margin-bottom:16px;}
+    /* 広告エリア */
     .ad-label{font-size:10px;color:var(--text3);text-align:center;margin-bottom:4px;letter-spacing:0.05em;}
-    .adsense-slot{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);min-height:70px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);}
+    .ad-wrap{position:relative;margin-bottom:16px;padding-bottom:28px;}
+    .ad-outer{border-radius:10px;overflow:visible;position:relative;transition:border 0.3s;}
+    .ad-slot{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;min-height:70px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);position:relative;z-index:1;overflow:hidden;}
+
+    /* フレーム: レトロTV */
+    .frame-retro .ad-slot{border:8px solid #5c3d1e;border-radius:10px;box-shadow:inset 0 0 0 2px #c8961a;}
+    .retro-footer{display:none;text-align:center;font-size:10px;color:#9b7a2e;margin-top:4px;letter-spacing:0.05em;}
+    .frame-retro .retro-footer{display:block;}
+
+    /* フレーム: ネオン */
+    .frame-neon .ad-slot{border:3px solid #00ffcc;border-radius:8px;}
+    .neon-glow{display:none;position:absolute;inset:-5px;border-radius:13px;border:2px solid rgba(0,255,204,0.5);pointer-events:none;z-index:2;animation:neonPulse 1.5s ease-in-out infinite;}
+    .frame-neon .neon-glow{display:block;}
+    @keyframes neonPulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(0,255,204,0.6);}50%{opacity:0.4;box-shadow:0 0 2px rgba(0,255,204,0.2);}}
+
+    /* フレーム: 木 */
+    .frame-wood .ad-slot{border:10px solid #8B5E3C;border-radius:4px;}
+
+    /* フレーム: 宇宙 */
+    .frame-space .ad-slot{border:3px solid #2a2a6a;border-radius:10px;background:#060612;}
+    .space-bg{display:none;position:absolute;inset:0;border-radius:8px;overflow:hidden;pointer-events:none;z-index:0;}
+    .frame-space .space-bg{display:block;}
+    .space-bg .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 2s ease-in-out infinite;}
+    @keyframes twinkle{0%,100%{opacity:0.9;}50%{opacity:0.1;}}
+    .frame-space .ad-slot{background:transparent;position:relative;z-index:1;}
+
+    /* なかま */
+    .animals{position:absolute;left:0;right:0;bottom:0;height:28px;pointer-events:none;overflow:hidden;}
+    .animal{position:absolute;bottom:2px;font-size:20px;animation:animalWalk linear infinite;}
+    @keyframes animalWalk{0%{left:-30px;}100%{left:calc(100% + 30px);}}
+
+    /* ショップ */
+    .shop-toggle{width:100%;text-align:left;font-size:13px;font-weight:500;color:var(--text);background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif;}
+    .shop-panel{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+    .shop-kkk-bar{padding:12px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;}
+    .shop-kkk-label{font-size:12px;color:var(--text2);}
+    .shop-kkk-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--text);}
+    .shop-section{padding:12px 14px;border-bottom:1px solid var(--border2);}
+    .shop-section:last-child{border-bottom:none;}
+    .shop-section-title{font-size:11px;color:var(--text3);margin-bottom:10px;letter-spacing:0.04em;}
+    .shop-items{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .shop-item{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:10px 10px 8px;transition:border-color 0.15s;}
+    .shop-item.active{border:1.5px solid var(--green);background:rgba(29,158,117,0.06);}
+    .item-preview{font-size:22px;margin-bottom:4px;text-align:center;}
+    .item-name{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px;}
+    .item-desc{font-size:10px;color:var(--text3);line-height:1.5;margin-bottom:6px;}
+    .item-btn{width:100%;font-size:11px;padding:5px 0;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:center;}
+    .item-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .item-btn.using{color:var(--green);border-color:var(--green);cursor:default;}
+    .item-btn.owned{color:var(--text2);border-color:var(--border2);}
+    .item-btn.can-remove{color:var(--accent);border-color:var(--accent);}
 
     .log-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
     .log-header{padding:11px 16px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:500;}
-    .log-list{max-height:200px;overflow-y:auto;}
+    .log-list{max-height:180px;overflow-y:auto;}
     .log-row{padding:9px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;font-size:12px;}
     .log-row:last-child{border-bottom:none;}
     .log-time{color:var(--text3);font-family:'DM Mono',monospace;flex-shrink:0;}
-    .log-name{flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .log-name{flex:1;color:var(--text2);}
     .log-dur{color:var(--text);font-family:'DM Mono',monospace;flex-shrink:0;}
     .log-empty{padding:20px 16px;font-size:12px;color:var(--text3);}
-
     .reset-wrap{text-align:right;margin-bottom:8px;}
     .reset-btn{font-size:11px;color:var(--text3);background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:4px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
     .reset-btn:hover{color:var(--accent);border-color:var(--accent);}
@@ -76,11 +124,10 @@
 </head>
 <body>
 <div class="app">
-
   <header>
     <div class="header-text">
       <h1>広告ゲーム</h1>
-      <p>バナー広告を画面に表示しながら遊ぶWebゲームです。広告が画面の50%以上表示されている間だけ時間がカウントされます。どれだけ長く広告を見続けられるか挑戦してみよう！</p>
+      <p>バナー広告を画面に表示しながら遊ぶWebゲームです。広告が50%以上表示されている間KKKが貯まります。KKKでフレームやなかまをゲットしよう！</p>
     </div>
     <button class="settings-btn" onclick="toggleSettings()">⚙ 表示設定</button>
   </header>
@@ -120,26 +167,97 @@
       <div class="digital-time" id="digital-time">00:00:00</div>
       <div class="digital-date" id="digital-date"></div>
       <div class="legend">
-        <div class="leg"><div class="leg-dot" style="background:#1D9E75"></div>広告を見た時間</div>
-        <div class="leg"><div class="leg-dot" style="background:rgba(128,128,128,0.2)"></div>それ以外</div>
+        <div class="leg"><div class="leg-dot" style="background:#1D9E75"></div>60秒フル視聴</div>
+        <div class="leg"><div class="leg-dot" style="background:rgba(29,158,117,0.35)"></div>途中まで視聴</div>
+        <div class="leg"><div class="leg-dot" style="background:rgba(128,128,128,0.15)"></div>未視聴</div>
       </div>
     </div>
   </div>
 
   <div id="section-ad">
-    <div class="adsense-wrap">
-      <div class="ad-label">広 告</div>
-      <div class="adsense-slot" id="ad-slot">
-        <!-- AdSense審査通過後、このコメントをinsタグに置き換える
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-YOUR_ADSENSE_ID"
-             data-ad-slot="YOUR_AD_SLOT_ID"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        -->
-        広告審査通過後にここに表示されます
+    <div class="ad-label">広 告</div>
+    <div class="ad-wrap">
+      <div class="ad-outer frame-none" id="ad-outer">
+        <div class="space-bg" id="space-bg"></div>
+        <div class="neon-glow"></div>
+        <div class="ad-slot" id="ad-slot">
+          <!-- AdSense審査通過後、このコメントをinsタグに置き換える
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-YOUR_ADSENSE_ID"
+               data-ad-slot="YOUR_AD_SLOT_ID"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          -->
+          広告審査通過後にここに表示されます
+        </div>
+      </div>
+      <div class="retro-footer" id="retro-footer">📺 RETRO TV</div>
+      <div class="animals" id="animals"></div>
+    </div>
+  </div>
+
+  <!-- ショップ -->
+  <button class="shop-toggle" id="shop-toggle" onclick="toggleShop()">
+    <span>🛒 フレームショップ</span>
+    <span id="shop-arrow">▼</span>
+  </button>
+  <div class="shop-panel" id="shop-panel" style="display:none;">
+    <div class="shop-kkk-bar">
+      <span class="shop-kkk-label">🪙 所持KKK（こーこく）</span>
+      <span class="shop-kkk-val" id="kkk-disp">0</span>
+    </div>
+    <div class="shop-section">
+      <div class="shop-section-title">フレーム（1つ選択）</div>
+      <div class="shop-items">
+        <div class="shop-item active" id="item-none">
+          <div class="item-preview">⬜</div>
+          <div class="item-name">なし</div>
+          <div class="item-desc">デフォルト表示</div>
+          <div class="item-btn using" id="btn-none">使用中</div>
+        </div>
+        <div class="shop-item" id="item-retro">
+          <div class="item-preview">📺</div>
+          <div class="item-name">レトロTV</div>
+          <div class="item-desc">懐かしの木目調テレビ風フレーム</div>
+          <button class="item-btn" id="btn-retro" onclick="buyOrUse('retro',50)">50 KKK で買う</button>
+        </div>
+        <div class="shop-item" id="item-neon">
+          <div class="item-preview">💡</div>
+          <div class="item-name">ネオン</div>
+          <div class="item-desc">光る縁取りでピカピカ点滅</div>
+          <button class="item-btn" id="btn-neon" onclick="buyOrUse('neon',80)">80 KKK で買う</button>
+        </div>
+        <div class="shop-item" id="item-wood">
+          <div class="item-preview">🪵</div>
+          <div class="item-name">木の額縁</div>
+          <div class="item-desc">ナチュラルな木製フレーム</div>
+          <button class="item-btn" id="btn-wood" onclick="buyOrUse('wood',60)">60 KKK で買う</button>
+        </div>
+        <div class="shop-item" id="item-space">
+          <div class="item-preview">🌌</div>
+          <div class="item-name">宇宙・星空</div>
+          <div class="item-desc">背景が満天の星空に</div>
+          <button class="item-btn" id="btn-space" onclick="buyOrUse('space',120)">120 KKK で買う</button>
+        </div>
+      </div>
+    </div>
+    <div class="shop-section">
+      <div class="shop-section-title">なかま（複数選択可・広告の下をうろうろする）</div>
+      <div class="shop-items">
+        <div class="shop-item" id="item-chicken">
+          <div class="item-preview">🐔</div>
+          <div class="item-name">にわとり</div>
+          <div class="item-desc">コッコッコ…気ままに歩く</div>
+          <button class="item-btn" id="btn-chicken" onclick="buyOrUse('chicken',100)">100 KKK で買う</button>
+        </div>
+        <div class="shop-item" id="item-cat">
+          <div class="item-preview">🐱</div>
+          <div class="item-name">ねこ</div>
+          <div class="item-desc">気まぐれにのんびり歩く</div>
+          <button class="item-btn" id="btn-cat" onclick="buyOrUse('cat',150)">150 KKK で買う</button>
+        </div>
       </div>
     </div>
   </div>
@@ -165,130 +283,226 @@
     <a href="contact.html">お問い合わせ</a><br>
     &copy; 2026 広告ゲーム
   </footer>
-
 </div>
 <script>
-  const KEY_TOTAL='adgame_total',KEY_TODAY='adgame_today',KEY_DATE='adgame_date',KEY_SWITCH='adgame_switch',KEY_LOG='adgame_log',KEY_SETTINGS='adgame_settings';
+  // ---- キー ----
+  const KT='adgame_total',KD='adgame_today',KDate='adgame_date',KSW='adgame_switch',KL='adgame_log',KSet='adgame_settings',KKKK='adgame_kkk',KOwned='adgame_owned',KFrame='adgame_frame',KAnimals='adgame_animals';
+
   function todayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
-  let totalSecs=parseInt(localStorage.getItem(KEY_TOTAL)||'0');
-  let switchCount=parseInt(localStorage.getItem(KEY_SWITCH)||'0');
-  let savedDate=localStorage.getItem(KEY_DATE)||todayStr();
-  let todaySecs=savedDate===todayStr()?parseInt(localStorage.getItem(KEY_TODAY)||'0'):0;
-  let logItems=JSON.parse(localStorage.getItem(KEY_LOG)||'[]');
+
+  let totalSecs=parseInt(localStorage.getItem(KT)||'0');
+  let switchCount=parseInt(localStorage.getItem(KSW)||'0');
+  let savedDate=localStorage.getItem(KDate)||todayStr();
+  let todaySecs=savedDate===todayStr()?parseInt(localStorage.getItem(KD)||'0'):0;
+  let logItems=JSON.parse(localStorage.getItem(KL)||'[]');
+  let kkk=parseInt(localStorage.getItem(KKKK)||'0');
+  let owned=new Set(JSON.parse(localStorage.getItem(KOwned)||'["none"]'));
+  let activeFrame=localStorage.getItem(KFrame)||'none';
+  let activeAnimals=new Set(JSON.parse(localStorage.getItem(KAnimals)||'[]'));
   let isCounting=true;
 
-  // 設定
+  // ---- 設定 ----
   function toggleSettings(){const p=document.getElementById('settings-panel');p.style.display=p.style.display==='none'?'':'none';}
   function applySettings(){
     ['stats','clock','ad'].forEach(k=>{
       const on=document.getElementById('sw-'+k).checked;
       document.getElementById('section-'+k).style.display=on?'':'none';
     });
-    localStorage.setItem(KEY_SETTINGS,JSON.stringify({
-      stats:document.getElementById('sw-stats').checked,
-      clock:document.getElementById('sw-clock').checked,
-      ad:document.getElementById('sw-ad').checked,
-    }));
+    localStorage.setItem(KSet,JSON.stringify({stats:document.getElementById('sw-stats').checked,clock:document.getElementById('sw-clock').checked,ad:document.getElementById('sw-ad').checked}));
   }
   function restoreSettings(){
-    const saved=JSON.parse(localStorage.getItem(KEY_SETTINGS)||'{}');
-    ['stats','clock','ad'].forEach(k=>{
-      if(saved[k]===false){document.getElementById('sw-'+k).checked=false;document.getElementById('section-'+k).style.display='none';}
-    });
+    const saved=JSON.parse(localStorage.getItem(KSet)||'{}');
+    ['stats','clock','ad'].forEach(k=>{if(saved[k]===false){document.getElementById('sw-'+k).checked=false;document.getElementById('section-'+k).style.display='none';}});
   }
 
-  // データ
-  function saveData(){localStorage.setItem(KEY_TOTAL,totalSecs);localStorage.setItem(KEY_TODAY,todaySecs);localStorage.setItem(KEY_DATE,todayStr());localStorage.setItem(KEY_SWITCH,switchCount);localStorage.setItem(KEY_LOG,JSON.stringify(logItems.slice(-200)));}
-  function resetData(){if(!confirm('記録をすべてリセットしますか？'))return;totalSecs=0;todaySecs=0;switchCount=0;logItems=[];[KEY_TOTAL,KEY_TODAY,KEY_DATE,KEY_SWITCH,KEY_LOG].forEach(k=>localStorage.removeItem(k));document.getElementById('log-list').innerHTML='<div class="log-empty" id="log-empty">まだ記録がありません</div>';updateStats();}
+  // ---- データ ----
+  function saveData(){
+    localStorage.setItem(KT,totalSecs);localStorage.setItem(KD,todaySecs);localStorage.setItem(KDate,todayStr());
+    localStorage.setItem(KSW,switchCount);localStorage.setItem(KL,JSON.stringify(logItems.slice(-200)));
+    localStorage.setItem(KKKK,kkk);localStorage.setItem(KOwned,JSON.stringify([...owned]));
+    localStorage.setItem(KFrame,activeFrame);localStorage.setItem(KAnimals,JSON.stringify([...activeAnimals]));
+  }
+  function resetData(){
+    if(!confirm('記録とKKKをすべてリセットしますか？'))return;
+    totalSecs=0;todaySecs=0;switchCount=0;logItems=[];kkk=0;owned=new Set(['none']);activeFrame='none';activeAnimals=new Set();
+    [KT,KD,KDate,KSW,KL,KKKK,KOwned,KFrame,KAnimals].forEach(k=>localStorage.removeItem(k));
+    document.getElementById('log-list').innerHTML='<div class="log-empty" id="log-empty">まだ記録がありません</div>';
+    applyFrame('none');refreshAllShopUI();updateStats();
+  }
   function fmtTime(s){if(s<60)return s+'秒';const m=Math.floor(s/60),sc=s%60;if(m<60)return sc>0?m+'分'+sc+'秒':m+'分';const hh=Math.floor(m/60),rm=m%60;return rm>0?hh+'時間'+rm+'分':hh+'時間';}
   function fmtClock(ts){const d=new Date(ts);return[d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>n.toString().padStart(2,'0')).join(':');}
-  function updateStats(){document.getElementById('s-today').textContent=fmtTime(todaySecs);document.getElementById('s-total').textContent=fmtTime(totalSecs);document.getElementById('s-switch').textContent=switchCount+'回';}
+  function updateStats(){
+    document.getElementById('s-today').textContent=fmtTime(todaySecs);
+    document.getElementById('s-total').textContent=fmtTime(totalSecs);
+    document.getElementById('s-switch').textContent=switchCount+'回';
+    document.getElementById('kkk-disp').textContent=kkk.toLocaleString();
+  }
   function renderLog(){if(logItems.length===0)return;const list=document.getElementById('log-list');list.innerHTML='';logItems.slice().reverse().forEach(item=>{const row=document.createElement('div');row.className='log-row';row.innerHTML=`<span class="log-time">${item.time}</span><span class="log-name">${item.name}</span><span class="log-dur">${fmtTime(item.dur)}</span>`;list.appendChild(row);});}
   function addLog(startTs,dur,label){document.getElementById('log-empty')?.remove();const item={time:fmtClock(startTs),name:label,dur};logItems.push(item);const row=document.createElement('div');row.className='log-row';row.innerHTML=`<span class="log-time">${item.time}</span><span class="log-name">${item.name}</span><span class="log-dur">${fmtTime(dur)}</span>`;const list=document.getElementById('log-list');list.insertBefore(row,list.firstChild);saveData();}
 
-  // 広告50%表示チェック（IntersectionObserver）
+  // ---- ショップ ----
+  function toggleShop(){
+    const p=document.getElementById('shop-panel');
+    const open=p.style.display==='none';
+    p.style.display=open?'':'none';
+    document.getElementById('shop-arrow').textContent=open?'▲':'▼';
+    if(open) updateStats();
+  }
+
+  const FRAMES=['none','retro','neon','wood','space'];
+  const ANIMALS=['chicken','cat'];
+  const PRICES={none:0,retro:50,neon:80,wood:60,space:120,chicken:100,cat:150};
+
+  function applyFrame(frame){
+    const outer=document.getElementById('ad-outer');
+    outer.className='ad-outer frame-'+frame;
+    // 宇宙の星を生成
+    const spaceBg=document.getElementById('space-bg');
+    if(frame==='space'&&spaceBg.children.length===0){
+      for(let i=0;i<30;i++){
+        const s=document.createElement('div');s.className='star';
+        const size=Math.random()*2+1;
+        s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*2}s;animation-duration:${1+Math.random()*2}s;`;
+        spaceBg.appendChild(s);
+      }
+    }
+    // レトロフッター
+    document.getElementById('retro-footer').style.display=frame==='retro'?'block':'none';
+  }
+
+  function spawnAnimal(type){
+    const emojis={chicken:'🐔',cat:'🐱'};
+    const container=document.getElementById('animals');
+    function makeOne(){
+      if(!activeAnimals.has(type))return;
+      const el=document.createElement('div');
+      el.className='animal';el.dataset.type=type;
+      el.textContent=emojis[type];
+      const dur=5+Math.random()*4;
+      const delay=Math.random()*3;
+      el.style.cssText=`animation-duration:${dur}s;animation-delay:${delay}s;bottom:${Math.random()*6}px;`;
+      container.appendChild(el);
+      setTimeout(()=>{
+        el.remove();
+        if(activeAnimals.has(type))setTimeout(makeOne,Math.random()*2000+500);
+      },(dur+delay)*1000+200);
+    }
+    makeOne();
+    setTimeout(makeOne,2500);
+  }
+
+  function removeAnimals(type){
+    document.querySelectorAll(`.animal[data-type="${type}"]`).forEach(el=>el.remove());
+  }
+
+  function buyOrUse(id,price){
+    const isFrame=FRAMES.includes(id);
+    const isAnimal=ANIMALS.includes(id);
+    if(!owned.has(id)){
+      if(kkk<price){alert(`KKKが足りません！あと${price-kkk} KKK必要です`);return;}
+      kkk-=price;
+      owned.add(id);
+    }
+    if(isFrame){
+      activeFrame=id;
+      applyFrame(id);
+    }
+    if(isAnimal){
+      if(activeAnimals.has(id)){activeAnimals.delete(id);removeAnimals(id);}
+      else{activeAnimals.add(id);spawnAnimal(id);}
+    }
+    refreshAllShopUI();
+    saveData();
+    updateStats();
+  }
+
+  function refreshAllShopUI(){
+    // フレーム
+    FRAMES.forEach(f=>{
+      const item=document.getElementById('item-'+f);
+      const btn=document.getElementById('btn-'+f);
+      item.classList.toggle('active',f===activeFrame);
+      if(f==='none'){
+        btn.textContent=f===activeFrame?'使用中':'使う';
+        btn.className='item-btn '+(f===activeFrame?'using':'owned');
+        btn.onclick=f===activeFrame?null:()=>buyOrUse('none',0);
+      } else if(owned.has(f)){
+        btn.textContent=f===activeFrame?'使用中':'使う';
+        btn.className='item-btn '+(f===activeFrame?'using':'owned');
+        btn.onclick=f===activeFrame?null:()=>buyOrUse(f,PRICES[f]);
+        btn.disabled=false;
+      } else {
+        btn.textContent=PRICES[f]+' KKK で買う';
+        btn.className='item-btn';
+        btn.onclick=()=>buyOrUse(f,PRICES[f]);
+        btn.disabled=false;
+      }
+    });
+    // なかま
+    ANIMALS.forEach(a=>{
+      const item=document.getElementById('item-'+a);
+      const btn=document.getElementById('btn-'+a);
+      item.classList.toggle('active',activeAnimals.has(a));
+      if(owned.has(a)){
+        btn.textContent=activeAnimals.has(a)?'外す':'使う';
+        btn.className='item-btn '+(activeAnimals.has(a)?'can-remove':'owned');
+        btn.onclick=()=>buyOrUse(a,PRICES[a]);
+        btn.disabled=false;
+      } else {
+        btn.textContent=PRICES[a]+' KKK で買う';
+        btn.className='item-btn';
+        btn.onclick=()=>buyOrUse(a,PRICES[a]);
+        btn.disabled=false;
+      }
+    });
+  }
+
+  // ---- 広告50%表示チェック ----
   const adSlot=document.getElementById('ad-slot');
-  const observer=new IntersectionObserver(entries=>{
-    const ratio=entries[0].intersectionRatio;
-    isCounting=ratio>=0.5;
+  new IntersectionObserver(entries=>{
+    isCounting=entries[0].intersectionRatio>=0.5;
     const dot=document.getElementById('status-dot');
     const txt=document.getElementById('status-text');
     if(isCounting){dot.className='status-dot counting';txt.textContent='広告を表示中・カウント中';}
     else{dot.className='status-dot paused';txt.textContent='広告が隠れています・カウント停止中';}
-  },{threshold:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]});
-  observer.observe(adSlot);
+  },{threshold:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1]}).observe(adSlot);
 
-  // 時計
+  // ---- 時計 ----
   const CX=100,CY=100,R=92,canvas=document.getElementById('clock-canvas'),ctx=canvas.getContext('2d'),dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
-  const C={face:dark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)',rim:dark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',mark:dark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.18)',markMaj:dark?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.5)',num:dark?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.4)',handH:dark?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.82)',handM:dark?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.82)',handS:'#D85A30',center:dark?'#fff':'#1a1a18',adGreen:'#1D9E75',trackSec:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',trackMin:dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)'};
-
-  // secFlags・minFlags は「何秒目に広告を見たか」を記録
-  // インデックス0=0秒、59=59秒
-  let secFlags=new Array(60).fill(false);
-  let minFlags=new Array(60).fill(false);
-  let lastMin=-1,lastHour=-1,bannerTimer=0,slotStart=Date.now();
+  const C={face:dark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)',rim:dark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',mark:dark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.18)',markMaj:dark?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.5)',num:dark?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.4)',handH:dark?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.82)',handM:dark?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.82)',handS:'#D85A30',center:dark?'#fff':'#1a1a18',trackSec:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',trackMin:dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)'};
+  let secCount=new Array(60).fill(0),minCount=new Array(60).fill(0),lastMin=-1,lastHour=-1,bannerTimer=0,slotStart=Date.now();
   const SWITCH_SEC=15;
-
   function rad(d){return d*Math.PI/180;}
   function drawHand(deg,tip,base,w,color){ctx.save();ctx.translate(CX,CY);ctx.rotate(rad(deg));ctx.beginPath();ctx.moveTo(-w/2,base);ctx.lineTo(0,tip);ctx.lineTo(w/2,base);ctx.fillStyle=color;ctx.fill();ctx.restore();}
-
   function drawClock(){
     ctx.clearRect(0,0,200,200);
     const now=new Date(),h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
-
-    // 分・時が変わったらリセット（0秒から新しく始まる）
-    if(m!==lastMin){secFlags=new Array(60).fill(false);lastMin=m;}
-    if(h!==lastHour){minFlags=new Array(60).fill(false);lastHour=h;}
-
-    // カウント中のみ色をつける
-    if(isCounting){secFlags[s]=true;minFlags[m]=true;}
-
-    // 文字盤
+    if(m!==lastMin){secCount=new Array(60).fill(0);lastMin=m;}
+    if(h!==lastHour){minCount=new Array(60).fill(0);lastHour=h;}
+    if(isCounting){secCount[s]=1;minCount[m]=secCount.reduce((a,b)=>a+b,0);}
     ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=C.face;ctx.fill();ctx.strokeStyle=C.rim;ctx.lineWidth=1;ctx.stroke();
-
-    // 分トラック
     ctx.beginPath();ctx.arc(CX,CY,R-7,0,Math.PI*2);ctx.strokeStyle=C.trackMin;ctx.lineWidth=5;ctx.stroke();
-    for(let i=0;i<60;i++){
-      if(!minFlags[i])continue;
-      // i番目の「分」セグメント：i分の位置（0分=12時位置=上）
-      const a1=rad((i/60)*360-90-2.6),a2=rad((i/60)*360-90+2.6);
-      ctx.beginPath();ctx.arc(CX,CY,R-7,a1,a2);ctx.strokeStyle=C.adGreen;ctx.lineWidth=5;ctx.stroke();
-    }
-
-    // 秒トラック
+    for(let i=0;i<60;i++){if(minCount[i]<=0)continue;const ratio=Math.min(minCount[i]/60,1);const alpha=0.2+ratio*0.8;const a1=rad(i/60*360-90-2.6),a2=rad(i/60*360-90+2.6);ctx.beginPath();ctx.arc(CX,CY,R-7,a1,a2);ctx.strokeStyle=`rgba(29,158,117,${alpha.toFixed(2)})`;ctx.lineWidth=5;ctx.stroke();}
     ctx.beginPath();ctx.arc(CX,CY,R-16,0,Math.PI*2);ctx.strokeStyle=C.trackSec;ctx.lineWidth=3.5;ctx.stroke();
-    for(let i=0;i<60;i++){
-      if(!secFlags[i])continue;
-      // i番目の「秒」セグメント：i秒の位置（0秒=12時位置=上）
-      const a1=rad((i/60)*360-90-2.6),a2=rad((i/60)*360-90+2.6);
-      ctx.beginPath();ctx.arc(CX,CY,R-16,a1,a2);ctx.strokeStyle=C.adGreen;ctx.lineWidth=3.5;ctx.stroke();
-    }
-
-    // 目盛り
+    for(let i=0;i<60;i++){if(!secCount[i])continue;const a1=rad(i/60*360-90-2.6),a2=rad(i/60*360-90+2.6);ctx.beginPath();ctx.arc(CX,CY,R-16,a1,a2);ctx.strokeStyle='rgba(29,158,117,1)';ctx.lineWidth=3.5;ctx.stroke();}
     for(let i=0;i<60;i++){const a=rad(i/60*360-90),maj=i%5===0,r1=maj?R-23:R-21,r2=R-19;ctx.beginPath();ctx.moveTo(CX+r1*Math.cos(a),CY+r1*Math.sin(a));ctx.lineTo(CX+r2*Math.cos(a),CY+r2*Math.sin(a));ctx.strokeStyle=maj?C.markMaj:C.mark;ctx.lineWidth=maj?1.5:0.8;ctx.stroke();}
-
-    // 数字
     ctx.fillStyle=C.num;ctx.font='500 10px "DM Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';
     [[12,0],[3,90],[6,180],[9,270]].forEach(([n,deg])=>{const a=rad(deg-90);ctx.fillText(n,CX+(R-32)*Math.cos(a),CY+(R-32)*Math.sin(a));});
-
-    // 針
     drawHand((h%12)/12*360+m/60*30+s/3600*6,-38,9,3,C.handH);
     drawHand(m/60*360+s/60*6,-54,11,2,C.handM);
     ctx.save();ctx.translate(CX,CY);ctx.rotate(rad(s/60*360));ctx.beginPath();ctx.moveTo(-1,13);ctx.lineTo(0,-62);ctx.lineTo(1,13);ctx.fillStyle=C.handS;ctx.fill();ctx.restore();
     ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);ctx.fillStyle=C.center;ctx.fill();
-
-    // デジタル
     const pad=n=>n.toString().padStart(2,'0');
     document.getElementById('digital-time').textContent=`${pad(h)}:${pad(m)}:${pad(s)}`;
     const days=['日','月','火','水','木','金','土'];
     document.getElementById('digital-date').textContent=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
   }
 
-  // メインタイマー
+  // ---- メインタイマー ----
   setInterval(()=>{
     if(isCounting){
-      totalSecs++;todaySecs++;bannerTimer++;
-      if(localStorage.getItem(KEY_DATE)!==todayStr())todaySecs=1;
+      totalSecs++;todaySecs++;bannerTimer++;kkk++;
+      if(localStorage.getItem(KDate)!==todayStr())todaySecs=1;
       if(bannerTimer>=SWITCH_SEC){addLog(slotStart,Math.floor((Date.now()-slotStart)/1000),'バナー広告');switchCount++;slotStart=Date.now();bannerTimer=0;}
       if(totalSecs%10===0)saveData();
       updateStats();
@@ -296,10 +510,15 @@
     drawClock();
   },1000);
 
+  // ---- 起動時初期化 ----
   restoreSettings();
   renderLog();
   updateStats();
   drawClock();
+  applyFrame(activeFrame);
+  refreshAllShopUI();
+  // 保存済みなかまを復元
+  activeAnimals.forEach(a=>spawnAnimal(a));
 </script>
 </body>
 </html>
