@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="広告ゲームの使い方ガイドです。">
+  <title>使い方ガイド｜広告ゲーム</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{--bg:#f7f6f2;--surface:#fff;--surface2:#f0efe9;--border2:rgba(0,0,0,0.06);--text:#1a1a18;--text2:#6b6b65;--text3:#a8a8a2;--green:#1D9E75;--r:14px;--rs:8px;}
+    @media(prefers-color-scheme:dark){:root{--bg:#141412;--surface:#1e1e1b;--surface2:#28281f;--border2:rgba(255,255,255,0.06);--text:#f0efe9;--text2:#9a9a92;--text3:#5a5a54;}}
+    body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.8;min-height:100dvh;}
+    .wrap{max-width:640px;margin:0 auto;padding:32px 20px 64px;}
+    .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:24px;}
+    h1{font-size:22px;font-weight:500;margin-bottom:6px;}
+    .sub{font-size:13px;color:var(--text3);margin-bottom:28px;}
+    .card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;margin-bottom:16px;}
+    .card h2{font-size:15px;font-weight:500;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2);}
+    .step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border2);align-items:flex-start;}
+    .step:last-child{border-bottom:none;padding-bottom:0;}
+    .step-num{width:24px;height:24px;border-radius:50%;background:#E1F5EE;color:#0F6E56;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .step-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;}
+    .step-desc{font-size:13px;color:var(--text2);line-height:1.8;}
+    .feat-row{display:flex;gap:8px;font-size:13px;color:var(--text2);line-height:1.8;padding:6px 0;border-bottom:1px solid var(--border2);}
+    .feat-row:last-child{border-bottom:none;}
+    footer{margin-top:32px;text-align:center;font-size:11px;color:var(--text3);line-height:2.2;}
+    footer a{color:var(--text3);text-decoration:underline;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" class="back">← 広告ゲームに戻る</a>
+  <h1>使い方ガイド</h1>
+  <p class="sub">広告ゲームの基本的な遊び方を説明します。</p>
+
+  <div class="card">
+    <h2>基本の遊び方</h2>
+    <div class="step"><div class="step-num">1</div><div><div class="step-title">ページを開く</div><div class="step-desc">このページをブラウザで開くだけでゲームがスタートします。インストールは不要です。</div></div></div>
+    <div class="step"><div class="step-num">2</div><div><div class="step-title">バナー広告を画面に表示したままにする</div><div class="step-desc">バナー広告が画面に50%以上表示されている間だけ時間がカウントされます。スクロールして広告が隠れると自動的にカウントが止まります。</div></div></div>
+    <div class="step"><div class="step-num">3</div><div><div class="step-title">時計で視聴時間を確認する</div><div class="step-desc">広告を見ている時間は時計の文字盤に緑色で表示されます。外側の帯が「分」、内側の帯が「秒」を表しています。</div></div></div>
+    <div class="step"><div class="step-num">4</div><div><div class="step-title">記録を積み上げる</div><div class="step-desc">今日の広告表示時間・これまでの合計時間が上部に表示されます。ページを閉じてもデータは保存され、次回開いたときに続きから記録できます。</div></div></div>
+  </div>
+
+  <div class="card">
+    <h2>カウントが止まる条件</h2>
+    <div class="feat-row"><span style="color:#D85A30;flex-shrink:0">✕</span><span>バナー広告が画面に50%未満しか表示されていないとき</span></div>
+    <div class="feat-row"><span style="color:#D85A30;flex-shrink:0">✕</span><span>ページを閉じているとき・別のアプリを使っているとき</span></div>
+    <div class="feat-row"><span style="color:#1D9E75;flex-shrink:0">✓</span><span>広告が画面に50%以上表示されていればカウントが続きます</span></div>
+  </div>
+
+  <div class="card">
+    <h2>時計の見方</h2>
+    <div class="feat-row"><span style="color:#1D9E75;flex-shrink:0">●</span><span>外側の緑の帯：この1時間の中で広告を見ていた「分」を表します</span></div>
+    <div class="feat-row"><span style="color:#1D9E75;flex-shrink:0">●</span><span>内側の緑の帯：今の1分間の中で広告を見ていた「秒」を表します</span></div>
+    <div class="feat-row"><span style="color:#D85A30;flex-shrink:0">●</span><span>オレンジの秒針：現在時刻の秒針です</span></div>
+    <div class="feat-row"><span style="color:var(--text3);flex-shrink:0">●</span><span>緑のゲージは0秒・0分の位置（12時の方向）からスタートします</span></div>
+  </div>
+
+  <div class="card">
+    <h2>表示設定について</h2>
+    <div class="feat-row"><span style="flex-shrink:0">⚙</span><span>右上の「表示設定」ボタンから、統計・時計・バナー広告の表示・非表示を切り替えられます。設定はブラウザに保存されます。</span></div>
+  </div>
+
+  <footer>
+    <a href="index.html">トップに戻る</a>　|　<a href="faq.html">よくある質問</a>　|　<a href="contact.html">お問い合わせ</a>　|　<a href="privacy.html">プライバシーポリシー</a><br>
+    &copy; 2026 広告ゲーム
+  </footer>
+</div>
+</body>
+</html>

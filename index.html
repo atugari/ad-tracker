@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="このサイトを開いている間に表示されるバナー広告をどれくらい見たか確認できる無料Webアプリです。今日の視聴時間・累計時間をブラウザに自動保存します。">
-  <title>広告ウォッチタイマー｜バナー広告の視聴時間を記録</title>
+  <meta name="description" content="バナー広告を画面に表示しながら遊ぶ無料Webゲームです。広告を見ている時間を時計で可視化します。">
+  <title>広告ゲーム｜バナー広告を見て時間を記録しよう</title>
   <!-- AdSense審査通過後にコメントを外してIDを書き換える
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
   -->
@@ -22,7 +22,6 @@
     .settings-btn{flex-shrink:0;font-size:11px;color:var(--text3);background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:5px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:4px;}
     .settings-btn:hover{color:var(--text2);}
 
-    /* 設定パネル */
     .settings-panel{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;}
     .settings-title{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:10px;}
     .setting-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border2);}
@@ -35,12 +34,17 @@
     .sw-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform 0.2s;pointer-events:none;}
     .sw input:checked~.sw-thumb{transform:translateX(16px);}
 
-    .save-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);margin-bottom:12px;}
-    .save-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+    /* カウント状態バッジ */
+    .status-badge{display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:12px;}
+    .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background 0.3s;}
+    .status-dot.counting{background:var(--green);}
+    .status-dot.paused{background:var(--accent);}
+
     .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
     .stat{background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:10px 11px;}
     .stat-label{font-size:10px;color:var(--text3);line-height:1.4;margin-bottom:4px;}
     .stat-value{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:var(--text);}
+
     .clock-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:24px 20px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:16px;}
     #clock-canvas{width:200px;height:200px;}
     .digital-time{font-family:'DM Mono',monospace;font-size:32px;font-weight:500;letter-spacing:0.04em;color:var(--text);text-align:center;}
@@ -48,9 +52,11 @@
     .legend{display:flex;gap:16px;font-size:11px;color:var(--text2);margin-top:4px;}
     .leg{display:flex;align-items:center;gap:5px;}
     .leg-dot{width:9px;height:9px;border-radius:50%;}
+
     .adsense-wrap{margin-bottom:16px;}
     .ad-label{font-size:10px;color:var(--text3);text-align:center;margin-bottom:4px;letter-spacing:0.05em;}
     .adsense-slot{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);min-height:70px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);}
+
     .log-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
     .log-header{padding:11px 16px;border-bottom:1px solid var(--border2);font-size:13px;font-weight:500;}
     .log-list{max-height:200px;overflow-y:auto;}
@@ -60,13 +66,7 @@
     .log-name{flex:1;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .log-dur{color:var(--text);font-family:'DM Mono',monospace;flex-shrink:0;}
     .log-empty{padding:20px 16px;font-size:12px;color:var(--text3);}
-    .info-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:16px;}
-    .info-title{font-size:13px;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-    .info-icon{width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text2);flex-shrink:0;}
-    .info-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text2);line-height:1.7;padding:6px 0;border-bottom:1px solid var(--border2);}
-    .info-row:last-child{border-bottom:none;padding-bottom:0;}
-    .info-check{color:var(--green);flex-shrink:0;}
-    .info-x{color:var(--accent);flex-shrink:0;}
+
     .reset-wrap{text-align:right;margin-bottom:8px;}
     .reset-btn{font-size:11px;color:var(--text3);background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:4px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
     .reset-btn:hover{color:var(--accent);border-color:var(--accent);}
@@ -79,13 +79,12 @@
 
   <header>
     <div class="header-text">
-      <h1>広告ウォッチタイマー</h1>
-      <p>このサイトを開いている間に表示されるバナー広告をどれくらい見たか、時計で視覚的に確認できる無料ツールです。ページを閉じてもデータは保存され、次に開いたときに続きから記録できます。</p>
+      <h1>広告ゲーム</h1>
+      <p>バナー広告を画面に表示しながら遊ぶWebゲームです。広告が画面の50%以上表示されている間だけ時間がカウントされます。どれだけ長く広告を見続けられるか挑戦してみよう！</p>
     </div>
     <button class="settings-btn" onclick="toggleSettings()">⚙ 表示設定</button>
   </header>
 
-  <!-- 表示設定パネル -->
   <div class="settings-panel" id="settings-panel" style="display:none;">
     <div class="settings-title">表示する項目を選択</div>
     <div class="setting-row">
@@ -100,22 +99,17 @@
       <span class="setting-label">バナー広告</span>
       <label class="sw"><input type="checkbox" id="sw-ad" checked onchange="applySettings()"><div class="sw-track"></div><div class="sw-thumb"></div></label>
     </div>
-    <div class="setting-row">
-      <span class="setting-label">視聴の記録ログ</span>
-      <label class="sw"><input type="checkbox" id="sw-log" checked onchange="applySettings()"><div class="sw-track"></div><div class="sw-thumb"></div></label>
-    </div>
-    <div class="setting-row">
-      <span class="setting-label">データ保存の説明</span>
-      <label class="sw"><input type="checkbox" id="sw-info" checked onchange="applySettings()"><div class="sw-track"></div><div class="sw-thumb"></div></label>
-    </div>
   </div>
 
-  <div class="save-badge"><div class="save-dot"></div><span>データをこのブラウザに自動保存しています</span></div>
+  <div class="status-badge">
+    <div class="status-dot counting" id="status-dot"></div>
+    <span id="status-text">広告を表示中・カウント中</span>
+  </div>
 
   <div id="section-stats">
     <div class="stats">
-      <div class="stat"><div class="stat-label">今日のバナー広告視聴時間</div><div class="stat-value" id="s-today">0秒</div></div>
-      <div class="stat"><div class="stat-label">これまでの合計視聴時間</div><div class="stat-value" id="s-total">0秒</div></div>
+      <div class="stat"><div class="stat-label">今日の広告表示時間</div><div class="stat-value" id="s-today">0秒</div></div>
+      <div class="stat"><div class="stat-label">これまでの合計時間</div><div class="stat-value" id="s-total">0秒</div></div>
       <div class="stat"><div class="stat-label">広告の切り替わり回数</div><div class="stat-value" id="s-switch">0回</div></div>
     </div>
   </div>
@@ -135,7 +129,7 @@
   <div id="section-ad">
     <div class="adsense-wrap">
       <div class="ad-label">広 告</div>
-      <div class="adsense-slot">
+      <div class="adsense-slot" id="ad-slot">
         <!-- AdSense審査通過後、このコメントをinsタグに置き換える
         <ins class="adsbygoogle"
              style="display:block"
@@ -152,21 +146,10 @@
 
   <div id="section-log">
     <div class="log-card">
-      <div class="log-header">視聴の記録</div>
+      <div class="log-header">記録ログ</div>
       <div class="log-list" id="log-list">
         <div class="log-empty" id="log-empty">まだ記録がありません</div>
       </div>
-    </div>
-  </div>
-
-  <div id="section-info">
-    <div class="info-card">
-      <div class="info-title"><div class="info-icon">?</div>データの保存について</div>
-      <div class="info-row"><span class="info-check">✓</span><span>ページを閉じても、端末を再起動しても、データはこのブラウザに保存されています</span></div>
-      <div class="info-row"><span class="info-check">✓</span><span>次に開いたときに、前回までの合計視聴時間と記録が引き継がれます</span></div>
-      <div class="info-row"><span class="info-check">✓</span><span>10秒ごとに自動で保存されます。突然閉じてもデータはほぼ残ります</span></div>
-      <div class="info-row"><span class="info-x">✕</span><span>別のブラウザや別の端末では記録は引き継がれません</span></div>
-      <div class="info-row"><span class="info-x">✕</span><span>ブラウザの「閲覧履歴をすべて削除」を実行するとデータが消える場合があります</span></div>
     </div>
   </div>
 
@@ -180,49 +163,41 @@
     <a href="guide.html">使い方ガイド</a>　|　
     <a href="faq.html">よくある質問</a>　|　
     <a href="contact.html">お問い合わせ</a><br>
-    &copy; 2026 広告ウォッチタイマー
+    &copy; 2026 広告ゲーム
   </footer>
 
 </div>
 <script>
-  const KEY_TOTAL='adtracker_total',KEY_TODAY='adtracker_today',KEY_DATE='adtracker_date',KEY_SWITCH='adtracker_switch',KEY_LOG='adtracker_log',KEY_SETTINGS='adtracker_settings';
+  const KEY_TOTAL='adgame_total',KEY_TODAY='adgame_today',KEY_DATE='adgame_date',KEY_SWITCH='adgame_switch',KEY_LOG='adgame_log',KEY_SETTINGS='adgame_settings';
   function todayStr(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
   let totalSecs=parseInt(localStorage.getItem(KEY_TOTAL)||'0');
   let switchCount=parseInt(localStorage.getItem(KEY_SWITCH)||'0');
   let savedDate=localStorage.getItem(KEY_DATE)||todayStr();
   let todaySecs=savedDate===todayStr()?parseInt(localStorage.getItem(KEY_TODAY)||'0'):0;
   let logItems=JSON.parse(localStorage.getItem(KEY_LOG)||'[]');
+  let isCounting=true;
 
-  // 設定パネルの開閉
-  function toggleSettings(){
-    const p=document.getElementById('settings-panel');
-    p.style.display=p.style.display==='none'?'':'none';
-  }
-
-  // 表示設定を適用してlocalStorageに保存
+  // 設定
+  function toggleSettings(){const p=document.getElementById('settings-panel');p.style.display=p.style.display==='none'?'':'none';}
   function applySettings(){
-    const keys=['stats','clock','ad','log','info'];
-    const saved={};
-    keys.forEach(k=>{
+    ['stats','clock','ad'].forEach(k=>{
       const on=document.getElementById('sw-'+k).checked;
       document.getElementById('section-'+k).style.display=on?'':'none';
-      saved[k]=on;
     });
-    localStorage.setItem(KEY_SETTINGS,JSON.stringify(saved));
+    localStorage.setItem(KEY_SETTINGS,JSON.stringify({
+      stats:document.getElementById('sw-stats').checked,
+      clock:document.getElementById('sw-clock').checked,
+      ad:document.getElementById('sw-ad').checked,
+    }));
   }
-
-  // 起動時に設定を復元
   function restoreSettings(){
     const saved=JSON.parse(localStorage.getItem(KEY_SETTINGS)||'{}');
-    const keys=['stats','clock','ad','log','info'];
-    keys.forEach(k=>{
-      if(saved[k]===false){
-        document.getElementById('sw-'+k).checked=false;
-        document.getElementById('section-'+k).style.display='none';
-      }
+    ['stats','clock','ad'].forEach(k=>{
+      if(saved[k]===false){document.getElementById('sw-'+k).checked=false;document.getElementById('section-'+k).style.display='none';}
     });
   }
 
+  // データ
   function saveData(){localStorage.setItem(KEY_TOTAL,totalSecs);localStorage.setItem(KEY_TODAY,todaySecs);localStorage.setItem(KEY_DATE,todayStr());localStorage.setItem(KEY_SWITCH,switchCount);localStorage.setItem(KEY_LOG,JSON.stringify(logItems.slice(-200)));}
   function resetData(){if(!confirm('記録をすべてリセットしますか？'))return;totalSecs=0;todaySecs=0;switchCount=0;logItems=[];[KEY_TOTAL,KEY_TODAY,KEY_DATE,KEY_SWITCH,KEY_LOG].forEach(k=>localStorage.removeItem(k));document.getElementById('log-list').innerHTML='<div class="log-empty" id="log-empty">まだ記録がありません</div>';updateStats();}
   function fmtTime(s){if(s<60)return s+'秒';const m=Math.floor(s/60),sc=s%60;if(m<60)return sc>0?m+'分'+sc+'秒':m+'分';const hh=Math.floor(m/60),rm=m%60;return rm>0?hh+'時間'+rm+'分':hh+'時間';}
@@ -231,42 +206,94 @@
   function renderLog(){if(logItems.length===0)return;const list=document.getElementById('log-list');list.innerHTML='';logItems.slice().reverse().forEach(item=>{const row=document.createElement('div');row.className='log-row';row.innerHTML=`<span class="log-time">${item.time}</span><span class="log-name">${item.name}</span><span class="log-dur">${fmtTime(item.dur)}</span>`;list.appendChild(row);});}
   function addLog(startTs,dur,label){document.getElementById('log-empty')?.remove();const item={time:fmtClock(startTs),name:label,dur};logItems.push(item);const row=document.createElement('div');row.className='log-row';row.innerHTML=`<span class="log-time">${item.time}</span><span class="log-name">${item.name}</span><span class="log-dur">${fmtTime(dur)}</span>`;const list=document.getElementById('log-list');list.insertBefore(row,list.firstChild);saveData();}
 
+  // 広告50%表示チェック（IntersectionObserver）
+  const adSlot=document.getElementById('ad-slot');
+  const observer=new IntersectionObserver(entries=>{
+    const ratio=entries[0].intersectionRatio;
+    isCounting=ratio>=0.5;
+    const dot=document.getElementById('status-dot');
+    const txt=document.getElementById('status-text');
+    if(isCounting){dot.className='status-dot counting';txt.textContent='広告を表示中・カウント中';}
+    else{dot.className='status-dot paused';txt.textContent='広告が隠れています・カウント停止中';}
+  },{threshold:[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]});
+  observer.observe(adSlot);
+
+  // 時計
   const CX=100,CY=100,R=92,canvas=document.getElementById('clock-canvas'),ctx=canvas.getContext('2d'),dark=window.matchMedia('(prefers-color-scheme:dark)').matches;
   const C={face:dark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.02)',rim:dark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.1)',mark:dark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.18)',markMaj:dark?'rgba(255,255,255,0.55)':'rgba(0,0,0,0.5)',num:dark?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.4)',handH:dark?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.82)',handM:dark?'rgba(255,255,255,0.88)':'rgba(0,0,0,0.82)',handS:'#D85A30',center:dark?'#fff':'#1a1a18',adGreen:'#1D9E75',trackSec:dark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',trackMin:dark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)'};
-  let secFlags=new Array(60).fill(false),minFlags=new Array(60).fill(false),lastMin=-1,lastHour=-1,bannerTimer=0,slotStart=Date.now();
+
+  // secFlags・minFlags は「何秒目に広告を見たか」を記録
+  // インデックス0=0秒、59=59秒
+  let secFlags=new Array(60).fill(false);
+  let minFlags=new Array(60).fill(false);
+  let lastMin=-1,lastHour=-1,bannerTimer=0,slotStart=Date.now();
   const SWITCH_SEC=15;
+
   function rad(d){return d*Math.PI/180;}
   function drawHand(deg,tip,base,w,color){ctx.save();ctx.translate(CX,CY);ctx.rotate(rad(deg));ctx.beginPath();ctx.moveTo(-w/2,base);ctx.lineTo(0,tip);ctx.lineTo(w/2,base);ctx.fillStyle=color;ctx.fill();ctx.restore();}
+
   function drawClock(){
     ctx.clearRect(0,0,200,200);
     const now=new Date(),h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
-    if(m!==lastMin){if(lastMin!==-1)secFlags=new Array(60).fill(false);lastMin=m;}
-    if(h!==lastHour){if(lastHour!==-1)minFlags=new Array(60).fill(false);lastHour=h;}
-    secFlags[s]=true;minFlags[m]=true;
+
+    // 分・時が変わったらリセット（0秒から新しく始まる）
+    if(m!==lastMin){secFlags=new Array(60).fill(false);lastMin=m;}
+    if(h!==lastHour){minFlags=new Array(60).fill(false);lastHour=h;}
+
+    // カウント中のみ色をつける
+    if(isCounting){secFlags[s]=true;minFlags[m]=true;}
+
+    // 文字盤
     ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=C.face;ctx.fill();ctx.strokeStyle=C.rim;ctx.lineWidth=1;ctx.stroke();
+
+    // 分トラック
     ctx.beginPath();ctx.arc(CX,CY,R-7,0,Math.PI*2);ctx.strokeStyle=C.trackMin;ctx.lineWidth=5;ctx.stroke();
-    for(let i=0;i<60;i++){if(!minFlags[i])continue;const a1=rad(i/60*360-90-2.6),a2=rad(i/60*360-90+2.6);ctx.beginPath();ctx.arc(CX,CY,R-7,a1,a2);ctx.strokeStyle=C.adGreen;ctx.lineWidth=5;ctx.stroke();}
+    for(let i=0;i<60;i++){
+      if(!minFlags[i])continue;
+      // i番目の「分」セグメント：i分の位置（0分=12時位置=上）
+      const a1=rad((i/60)*360-90-2.6),a2=rad((i/60)*360-90+2.6);
+      ctx.beginPath();ctx.arc(CX,CY,R-7,a1,a2);ctx.strokeStyle=C.adGreen;ctx.lineWidth=5;ctx.stroke();
+    }
+
+    // 秒トラック
     ctx.beginPath();ctx.arc(CX,CY,R-16,0,Math.PI*2);ctx.strokeStyle=C.trackSec;ctx.lineWidth=3.5;ctx.stroke();
-    for(let i=0;i<60;i++){if(!secFlags[i])continue;const a1=rad(i/60*360-90-2.6),a2=rad(i/60*360-90+2.6);ctx.beginPath();ctx.arc(CX,CY,R-16,a1,a2);ctx.strokeStyle=C.adGreen;ctx.lineWidth=3.5;ctx.stroke();}
+    for(let i=0;i<60;i++){
+      if(!secFlags[i])continue;
+      // i番目の「秒」セグメント：i秒の位置（0秒=12時位置=上）
+      const a1=rad((i/60)*360-90-2.6),a2=rad((i/60)*360-90+2.6);
+      ctx.beginPath();ctx.arc(CX,CY,R-16,a1,a2);ctx.strokeStyle=C.adGreen;ctx.lineWidth=3.5;ctx.stroke();
+    }
+
+    // 目盛り
     for(let i=0;i<60;i++){const a=rad(i/60*360-90),maj=i%5===0,r1=maj?R-23:R-21,r2=R-19;ctx.beginPath();ctx.moveTo(CX+r1*Math.cos(a),CY+r1*Math.sin(a));ctx.lineTo(CX+r2*Math.cos(a),CY+r2*Math.sin(a));ctx.strokeStyle=maj?C.markMaj:C.mark;ctx.lineWidth=maj?1.5:0.8;ctx.stroke();}
+
+    // 数字
     ctx.fillStyle=C.num;ctx.font='500 10px "DM Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';
     [[12,0],[3,90],[6,180],[9,270]].forEach(([n,deg])=>{const a=rad(deg-90);ctx.fillText(n,CX+(R-32)*Math.cos(a),CY+(R-32)*Math.sin(a));});
+
+    // 針
     drawHand((h%12)/12*360+m/60*30+s/3600*6,-38,9,3,C.handH);
     drawHand(m/60*360+s/60*6,-54,11,2,C.handM);
     ctx.save();ctx.translate(CX,CY);ctx.rotate(rad(s/60*360));ctx.beginPath();ctx.moveTo(-1,13);ctx.lineTo(0,-62);ctx.lineTo(1,13);ctx.fillStyle=C.handS;ctx.fill();ctx.restore();
     ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);ctx.fillStyle=C.center;ctx.fill();
+
+    // デジタル
     const pad=n=>n.toString().padStart(2,'0');
     document.getElementById('digital-time').textContent=`${pad(h)}:${pad(m)}:${pad(s)}`;
     const days=['日','月','火','水','木','金','土'];
     document.getElementById('digital-date').textContent=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日（${days[now.getDay()]}）`;
   }
 
+  // メインタイマー
   setInterval(()=>{
-    totalSecs++;todaySecs++;bannerTimer++;
-    if(localStorage.getItem(KEY_DATE)!==todayStr())todaySecs=1;
-    updateStats();drawClock();
-    if(bannerTimer>=SWITCH_SEC){addLog(slotStart,Math.floor((Date.now()-slotStart)/1000),'バナー広告');switchCount++;slotStart=Date.now();bannerTimer=0;}
-    if(totalSecs%10===0)saveData();
+    if(isCounting){
+      totalSecs++;todaySecs++;bannerTimer++;
+      if(localStorage.getItem(KEY_DATE)!==todayStr())todaySecs=1;
+      if(bannerTimer>=SWITCH_SEC){addLog(slotStart,Math.floor((Date.now()-slotStart)/1000),'バナー広告');switchCount++;slotStart=Date.now();bannerTimer=0;}
+      if(totalSecs%10===0)saveData();
+      updateStats();
+    }
+    drawClock();
   },1000);
 
   restoreSettings();
