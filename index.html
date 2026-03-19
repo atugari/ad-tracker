@@ -39,7 +39,7 @@
     .timer-text{font-family:'DM Mono',monospace;text-align:center;font-size:12px;font-weight:500;margin-bottom:6px;min-height:18px;color:var(--text2);}
     .timer-text.danger{color:var(--accent);}
     .msg{text-align:center;font-size:13px;color:var(--text2);min-height:20px;margin-bottom:10px;}
-    .msg.success{color:var(--green);} .msg.fail{color:var(--accent);} .msg.info{color:var(--blue);}
+    .msg.success{color:var(--green);} .msg.fail{color:var(--accent);} .msg.info{color:var(--blue);} .msg.watch{color:var(--accent);font-weight:500;} .grid.locked{pointer-events:none;opacity:0.65;} .grid.locked .cell{cursor:default;}
     .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px;}
     .cell{aspect-ratio:1;border-radius:var(--rs);background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.1s;}
     .cell:hover{background:var(--surface);} .cell:active{transform:scale(0.95);}
@@ -335,7 +335,7 @@
     document.getElementById('answer-btn').disabled=true;
     document.getElementById('sel-count').textContent='';
     document.getElementById('stage-score-disp').textContent='0';
-    stopTimer();setMsg('よく見て覚えよう！');buildGrid();
+    stopTimer();setMsg('👁 よく見て覚えよう！タップはまだダメ！','watch');buildGrid();document.getElementById('grid').classList.add('locked');
 
     const cfg=getCfg(),FADE=cfg.fadeIn;
     const positions=shuffle([...Array(16).keys()]).slice(0,cfg.dots);
@@ -358,12 +358,12 @@
         setTimeout(()=>{dot.style.transition=`opacity ${FADE}ms ease-in-out`;dot.style.opacity='0';},FADE+dur);
       },delay);
     });
-    setTimeout(()=>enterAnswerPhase(),lastFinish+150);
+    setTimeout(()=>{document.getElementById('grid').classList.remove('locked');enterAnswerPhase();},lastFinish+150);
   }
 
   function enterAnswerPhase(){
     phase='answering';
-    setMsg(`${getCfg().dots}個を3秒以内にタップして答えよう！`,'info');
+    setMsg(`⚡ 今すぐ！${getCfg().dots}個を3秒以内にタップ！`,'info');
     document.getElementById('answer-btn').disabled=false;
     updateSelCount();startTimer();
   }
@@ -376,7 +376,7 @@
     } else {
       if(selectedCells.length>=cfg.dots){
         setMsg(`選べるのは${cfg.dots}個まで！`,'fail');
-        setTimeout(()=>setMsg(`${cfg.dots}個を3秒以内にタップして答えよう！`,'info'),800);
+        setTimeout(()=>setMsg(`⚡ 今すぐ！${cfg.dots}個を3秒以内にタップ！`,'info'),800);
         return;
       }
       selectedCells.push(idx);cell.classList.add('selected');
