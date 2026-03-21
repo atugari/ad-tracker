@@ -139,23 +139,11 @@
   <div class="toast-desc" id="toast-desc"></div>
 </div>
 <div class="app">
-  <div class="ad-label" id="ad-label-wrap">広 告</div>
-  <div class="adsense-slot" id="ad-slot">
-    <!-- AdSense審査通過後、このコメントをinsタグに置き換える
-    <ins class="adsbygoogle" style="display:block"
-         data-ad-client="ca-pub-YOUR_ADSENSE_ID"
-         data-ad-slot="YOUR_AD_SLOT_ID"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    -->
-    広告審査通過後にここに表示されます
-  </div>
 
   <!-- ニックネーム画面 -->
   <div class="screen active" id="screen-nick">
 
-    <!-- 表示設定パネル -->
+    <!-- 表示設定パネル（最上部） -->
     <div class="disp-settings" id="disp-settings-panel">
       <div class="disp-settings-hd" onclick="toggleDispPanel()">
         <div class="disp-settings-hd-left">
@@ -165,9 +153,9 @@
         <span class="disp-settings-hd-arrow" id="disp-arrow">▼</span>
       </div>
       <div class="disp-body" id="disp-body">
-        <div class="disp-row">
+        <div class="disp-row" id="disp-row-ad">
           <span class="disp-label">バナー広告</span>
-          <label class="toggle-wrap">
+          <label class="toggle-wrap" id="tog-ad-wrap">
             <input type="checkbox" id="tog-ad" onchange="applyDispSettings()">
             <span class="toggle-track"></span>
             <span class="toggle-thumb"></span>
@@ -198,6 +186,20 @@
           </label>
         </div>
       </div>
+    </div>
+
+    <!-- バナー広告（設定パネルの下） -->
+    <div class="ad-label" id="ad-label-wrap">広 告</div>
+    <div class="adsense-slot" id="ad-slot">
+      <!-- AdSense審査通過後、このコメントをinsタグに置き換える
+      <ins class="adsbygoogle" style="display:block"
+           data-ad-client="ca-pub-YOUR_ADSENSE_ID"
+           data-ad-slot="YOUR_AD_SLOT_ID"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      -->
+      広告審査通過後にここに表示されます
     </div>
 
     <!-- 月間ランキングバナー -->
@@ -835,27 +837,83 @@
   }
 
   function applyDispSettings() {
-    // トグルの現在値を読む
     const s = {
       ad:     document.getElementById('tog-ad').checked,
       banner: document.getElementById('tog-banner').checked,
       titles: document.getElementById('tog-titles').checked,
       game:   document.getElementById('tog-game').checked,
     };
+
+    // 広告をOFFにしようとした → 称号付与して強制ON
+    if (!s.ad && !localStorage.getItem(AD_LOCKED_KEY)) {
+      grantAdKillerTitle();
+      return; // grantAdKillerTitle内でONに戻して再呼び出し
+    }
+
     localStorage.setItem('adgame_disp', JSON.stringify(s));
-
-    const show = (id, visible) => {
-      const el = document.getElementById(id);
-      if(el) el.style.display = visible ? '' : 'none';
-    };
-    show('ad-label-wrap',   s.ad);
-    show('ad-slot',         s.ad);
-    show('monthly-banner',  s.banner);
-    show('titles-section',  s.titles);
-    show('nick-card-wrap',  s.game);
-
+    const show = (id, visible) => { const el=document.getElementById(id); if(el) el.style.display = visible ? '' : 'none'; };
+    show('ad-label-wrap',  s.ad);
+    show('ad-slot',        s.ad);
+    show('monthly-banner', s.banner);
+    show('titles-section', s.titles);
+    show('nick-card-wrap', s.game);
     if(s.banner) loadBannerRanking(currentBannerTab);
     if(s.titles) renderHomeTitles();
+  }
+
+  // 称号「それは勘弁してくれ……」付与＋広告強制ON＋トグルロック
+  function grantAdKillerTitle() {
+    // 広告を強制ONに戻す
+    const tog = document.getElementById('tog-ad');
+    tog.checked = true;
+
+    // 称号付与
+    const existing = getMyTitles();
+    const existingIds = new Set(existing.map(t => t.id));
+    const def = TITLE_DEFS.find(d => d.id === 'ad_killer');
+    if (def && !existingIds.has('ad_killer')) {
+      existing.unshift({ id: 'ad_killer', obtainedAt: Date.now() });
+      saveMyTitles(existing);
+      showTitleToast(def);
+      renderHomeTitles();
+    }
+
+    // トグルをロック（無効化＋見た目グレーアウト）
+    lockAdToggle();
+
+    // 設定を保存（ad=true で）
+    const s = {
+      ad: true,
+      banner: document.getElementById('tog-banner').checked,
+      titles: document.getElementById('tog-titles').checked,
+      game:   document.getElementById('tog-game').checked,
+    };
+    localStorage.setItem('adgame_disp', JSON.stringify(s));
+    localStorage.setItem(AD_LOCKED_KEY, '1');
+
+    const show = (id, visible) => { const el=document.getElementById(id); if(el) el.style.display = visible ? '' : 'none'; };
+    show('ad-label-wrap',  true);
+    show('ad-slot',        true);
+    show('monthly-banner', s.banner);
+    show('titles-section', s.titles);
+    show('nick-card-wrap', s.game);
+    if(s.banner) loadBannerRanking(currentBannerTab);
+    if(s.titles) renderHomeTitles();
+  }
+
+  function lockAdToggle() {
+    const tog = document.getElementById('tog-ad');
+    const wrap = document.getElementById('tog-ad-wrap');
+    if(tog) tog.disabled = true;
+    if(wrap) { wrap.style.opacity='0.35'; wrap.style.pointerEvents='none'; wrap.style.cursor='not-allowed'; }
+  }
+
+  // 広告トグル行を完全に非表示にする（titles.htmlから呼ばれる想定でlocalStorageキーで管理）
+  function applyAdRowHidden() {
+    if(localStorage.getItem(AD_ROW_HIDDEN_KEY)==='1') {
+      const row = document.getElementById('disp-row-ad');
+      if(row) row.style.display='none';
+    }
   }
 
   function initDispSettings() {
@@ -864,6 +922,12 @@
     document.getElementById('tog-banner').checked = s.banner;
     document.getElementById('tog-titles').checked = s.titles;
     document.getElementById('tog-game').checked   = s.game;
+
+    // ロック状態を復元
+    if(localStorage.getItem(AD_LOCKED_KEY)==='1') lockAdToggle();
+    // 広告行の非表示を復元
+    applyAdRowHidden();
+
     applyDispSettings();
   }
 
@@ -872,11 +936,20 @@
   localStorage.removeItem('adgame_sections_hidden');
 
   // ===== 称号システム =====
-  // 称号マスターデータ（あとで追加しやすい構造）
   const TITLE_DEFS = [
-    // { id, icon, name, desc, check(score, stageScores) }
-    // 現時点ではプレースホルダー。チャレンジ完了時にチェックされる
+    {
+      id: 'ad_killer',
+      icon: '🙏',
+      name: 'それは勘弁してくれ……',
+      desc: '広告を非表示にしようとした',
+      check: () => false, // チャレンジ完了時ではなく広告OFFで付与するため常にfalse
+    },
   ];
+
+  // 広告トグルのロック状態キー
+  const AD_LOCKED_KEY = 'adgame_ad_locked';
+  // 広告トグル行を完全に非表示にするキー
+  const AD_ROW_HIDDEN_KEY = 'adgame_ad_row_hidden';
 
   function getMyTitles() {
     try { return JSON.parse(localStorage.getItem('adgame_titles') || '[]'); }

@@ -31,6 +31,10 @@
     .tr-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px;}
     .tr-desc{font-size:12px;color:var(--text2);}
     .tr-date{font-size:10px;color:var(--green);margin-top:3px;}
+    .tr-action{margin-top:8px;}
+    .tr-action-btn{font-size:11px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:var(--rs);padding:4px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:background 0.1s;}
+    .tr-action-btn:hover{background:rgba(216,90,48,0.07);}
+    .tr-action-btn.done{color:var(--text3);border-color:var(--border2);cursor:default;pointer-events:none;}
     .empty-state{padding:32px 16px;text-align:center;font-size:13px;color:var(--text3);}
     footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--border2);text-align:center;font-size:11px;color:var(--text3);}
 
@@ -88,8 +92,16 @@
 
 <script>
   const TITLE_DEFS = [
-    // { id:'first_clear', icon:'★', name:'はじめての挑戦', desc:'初めてチャレンジを完了した' }
+    {
+      id: 'ad_killer',
+      icon: '🙏',
+      name: 'それは勘弁してくれ……',
+      desc: '広告を非表示にしようとした',
+    },
   ];
+
+  const AD_LOCKED_KEY   = 'adgame_ad_locked';
+  const AD_ROW_HIDDEN_KEY = 'adgame_ad_row_hidden';
 
   function fmtDate(ts){
     if(!ts)return'';
@@ -97,6 +109,13 @@
     return d.getFullYear()+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0')+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
   }
   function getMyTitles(){try{return JSON.parse(localStorage.getItem('adgame_titles')||'[]');}catch(e){return[];}}
+
+  // 広告トグル行を非表示にする
+  function hideAdRow() {
+    localStorage.setItem(AD_ROW_HIDDEN_KEY, '1');
+    const btn = document.getElementById('hide-ad-row-btn');
+    if(btn){ btn.textContent='非表示にしました'; btn.classList.add('done'); }
+  }}
 
   // ===== 通常一覧 =====
   function render(myIds, myMap){
@@ -114,7 +133,15 @@
         const t=myMap[def.id];
         const row=document.createElement('div');
         row.className='title-row-plain unlocked';
-        row.innerHTML='<div class="tr-icon-wrap">'+def.icon+'</div><div class="tr-body"><div class="tr-name">'+def.name+'</div><div class="tr-desc">'+def.desc+'</div><div class="tr-date">入手：'+fmtDate(t?.obtainedAt)+'</div></div>';
+
+        // ad_killer 専用の詳細アクション
+        let extra='';
+        if(def.id==='ad_killer'){
+          const alreadyHidden = localStorage.getItem(AD_ROW_HIDDEN_KEY)==='1';
+          extra='<div class="tr-action"><button id="hide-ad-row-btn" class="tr-action-btn'+(alreadyHidden?' done':'')+'" onclick="hideAdRow()">'+(alreadyHidden?'非表示にしました':'設定から広告トグルを非表示にする')+'</button></div>';
+        }
+
+        row.innerHTML='<div class="tr-icon-wrap">'+def.icon+'</div><div class="tr-body"><div class="tr-name">'+def.name+'</div><div class="tr-desc">'+def.desc+'</div><div class="tr-date">入手：'+fmtDate(t?.obtainedAt)+'</div>'+extra+'</div>';
         obtainedEl.appendChild(row);
       });
     }
