@@ -521,10 +521,39 @@
   function getCfg(){return LEVEL_CFG[STAGE_LEVELS[stageIdx]];}
   function randomTypes(n){const p=['gold','silver','red'];return Array.from({length:n},()=>p[Math.floor(Math.random()*p.length)]);}
 
+  // 予約ニックネーム（製作者専用端末IDのみ使用可能）
+  // 製作者の端末IDがまだFirebaseに登録されていない場合は初回登録を許可し、
+  // 登録済みの場合は同じ端末IDからのみ使用を許可する。
+  const RESERVED_NICKS = ['製作者'];
+
   async function startChallenge(){
     const val=document.getElementById('nick-input').value.trim();
     const msgEl=document.getElementById('nick-msg');
     if(!val){msgEl.textContent='ニックネームを入力してください';msgEl.style.color='var(--accent)';return;}
+
+    // 予約ニックネームチェック
+    if(RESERVED_NICKS.includes(val)){
+      msgEl.textContent='確認中...';msgEl.style.color='var(--text3)';
+      try{
+        const key=encodeURIComponent(val.replace(/[.#$[\]/]/g,'_'));
+        const res=await fetch(DB_URL+'/rankings/'+key+'.json');
+        const existing=await res.json();
+        const now=Date.now();
+        const isExpired=existing&&(now-existing.updatedAt)>ONE_YEAR;
+        // Firebaseに登録済み & 期限切れでない & 別端末 → 使用不可
+        if(existing&&!isExpired&&existing.deviceId&&existing.deviceId!==DEVICE_ID){
+          msgEl.textContent='「'+val+'」は使用できません。';
+          msgEl.style.color='var(--accent)';
+          return;
+        }
+        // 未登録 or 期限切れ or 同じ端末 → 続行
+      }catch(e){
+        // ネットワークエラー時は予約名を使わせない（安全側に倒す）
+        msgEl.textContent='確認できませんでした。ネットワークを確認してください。';
+        msgEl.style.color='var(--accent)';
+        return;
+      }
+    }
 
     // 30日制限チェック（サーバー側でなくlocalStorageで管理）
     const savedNick2=localStorage.getItem('adgame_nick');

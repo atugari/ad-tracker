@@ -63,9 +63,73 @@
     .ar-skip:hover,.ar-skip:active{color:#888876;}
     .ar-done-msg{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);color:#ffe87a;font-size:12px;font-weight:500;letter-spacing:0.08em;opacity:0;transition:opacity 0.5s;white-space:nowrap;}
     .ar-done-msg.show{opacity:1;}
+
+    /* デバッグパネル */
+    #debug-panel{display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);overflow-y:auto;}
+    .debug-inner{background:var(--surface);margin:16px;border-radius:var(--r);overflow:hidden;}
+    .debug-hd{background:#1a1a18;color:#f0efe9;padding:14px 16px;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
+    .debug-hd span{font-size:10px;color:#888;font-weight:400;margin-left:6px;}
+    .debug-close{background:none;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 4px;}
+    .debug-section{padding:12px 16px;border-bottom:1px solid var(--border2);}
+    .debug-section:last-child{border-bottom:none;}
+    .debug-section-title{font-size:11px;color:var(--text3);letter-spacing:0.06em;margin-bottom:8px;font-weight:500;}
+    .debug-btn{display:block;width:100%;padding:9px 12px;margin-bottom:6px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface2);font-size:13px;color:var(--text);cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;transition:background 0.1s;}
+    .debug-btn:last-child{margin-bottom:0;}
+    .debug-btn:hover{background:var(--surface);}
+    .debug-btn.danger{border-color:var(--accent);color:var(--accent);background:none;}
+    .debug-btn.danger:hover{background:rgba(216,90,48,0.06);}
+    .debug-btn.ok{border-color:var(--green);color:var(--green);background:none;}
+    .debug-log{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface2);border-radius:var(--rs);padding:10px 12px;max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin-top:8px;line-height:1.7;}
+    .debug-nick-row{display:flex;gap:6px;margin-bottom:6px;}
+    .debug-nick-input{flex:1;font-size:13px;padding:8px 10px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:'Noto Sans JP',sans-serif;}
+    .debug-nick-input:focus{outline:none;border-color:var(--blue);}
+    .debug-status{font-size:11px;min-height:16px;margin-top:4px;color:var(--green);}
   </style>
 </head>
 <body>
+
+<!-- デバッグパネル -->
+<div id="debug-panel">
+  <div class="debug-inner">
+    <div class="debug-hd">
+      <div>デバッグモード<span>※ 開発者専用</span></div>
+      <button class="debug-close" onclick="closeDebug()">✕</button>
+    </div>
+
+    <!-- Firebase スコア削除 -->
+    <div class="debug-section">
+      <div class="debug-section-title">FIREBASE — ランキングデータ削除</div>
+      <div class="debug-nick-row">
+        <input class="debug-nick-input" id="debug-nick" placeholder="ニックネームを入力（例：製作者）">
+        <button class="debug-btn danger" style="width:auto;padding:8px 12px;margin:0;" onclick="debugDeleteFirebase()">削除</button>
+      </div>
+      <div class="debug-status" id="debug-fb-status"></div>
+    </div>
+
+    <!-- localStorage 個別リセット -->
+    <div class="debug-section">
+      <div class="debug-section-title">LOCALSTORAGE — 項目別リセット</div>
+      <button class="debug-btn" onclick="debugReset('adgame_nick','adgame_nick_changed')">ニックネームをリセット</button>
+      <button class="debug-btn" onclick="debugReset('adgame_titles')">称号をリセット</button>
+      <button class="debug-btn" onclick="debugReset('adgame_disp','adgame_ad_locked','adgame_ad_row_hidden','adgame_sections_hidden','adgame_banner_hidden')">表示設定をリセット</button>
+      <button class="debug-btn" onclick="debugReset('adgame_device_id')">端末IDをリセット（新規ユーザー扱いに）</button>
+    </div>
+
+    <!-- localStorage 完全リセット -->
+    <div class="debug-section">
+      <div class="debug-section-title">LOCALSTORAGE — 完全リセット</div>
+      <button class="debug-btn danger" onclick="debugResetAll()">全データを消去してリロード</button>
+    </div>
+
+    <!-- 現在のデータ確認 -->
+    <div class="debug-section">
+      <div class="debug-section-title">現在の LOCALSTORAGE</div>
+      <button class="debug-btn ok" onclick="debugShowStorage()">データを表示</button>
+      <div class="debug-log" id="debug-log" style="display:none"></div>
+    </div>
+
+  </div>
+</div>
 
 <div id="airride-overlay">
   <div class="ar-header" id="ar-header">称号一覧</div>
@@ -77,7 +141,7 @@
 <div class="app" id="main-app" style="opacity:0;transition:opacity 0.4s;">
   <div class="page-header">
     <a class="back-btn" href="index.html">←</a>
-    <span class="page-title">称号一覧</span>
+    <span class="page-title" id="page-title-tap" style="user-select:none;">称号一覧</span>
   </div>
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-val" id="count-obtained">0</div><div class="stat-label">入手済み</div></div>
@@ -267,6 +331,83 @@
     }
     runAirride(myIds);
   })();
+
+  // ===== デバッグモード =====
+  const DB_URL = 'https://ad-game-7b40a-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+  // タイトルを5回タップで開く
+  let tapCount = 0, tapTimer = null;
+  document.getElementById('page-title-tap').addEventListener('click', () => {
+    tapCount++;
+    clearTimeout(tapTimer);
+    if(tapCount >= 5){
+      tapCount = 0;
+      openDebug();
+    } else {
+      tapTimer = setTimeout(() => tapCount = 0, 1500);
+    }
+  });
+
+  function openDebug(){
+    document.getElementById('debug-panel').style.display = 'block';
+    document.getElementById('debug-fb-status').textContent = '';
+    document.getElementById('debug-log').style.display = 'none';
+    // 現在のニックネームをデフォルト入力
+    const savedNick = localStorage.getItem('adgame_nick') || '';
+    document.getElementById('debug-nick').value = savedNick;
+  }
+
+  function closeDebug(){
+    document.getElementById('debug-panel').style.display = 'none';
+  }
+
+  // Firebase のスコアを指定ニックネームで削除
+  async function debugDeleteFirebase(){
+    const nick = document.getElementById('debug-nick').value.trim();
+    const status = document.getElementById('debug-fb-status');
+    if(!nick){ status.style.color='var(--accent)'; status.textContent='ニックネームを入力してください'; return; }
+    status.style.color='var(--text3)'; status.textContent='削除中…';
+    try {
+      const key = encodeURIComponent(nick.replace(/[.#$[\]/]/g,'_'));
+      const res = await fetch(DB_URL+'/rankings/'+key+'.json', { method:'DELETE' });
+      if(res.ok){
+        status.style.color='var(--green)';
+        status.textContent = '「'+nick+'」のFirebaseスコアを削除しました';
+      } else {
+        status.style.color='var(--accent)'; status.textContent = '削除失敗（status: '+res.status+'）';
+      }
+    } catch(e) {
+      status.style.color='var(--accent)'; status.textContent = 'エラー: '+e.message;
+    }
+  }
+
+  // localStorageの指定キーを削除してリロード
+  function debugReset(...keys){
+    if(!confirm(keys.join(', ') + '\nを削除してリロードします。よろしいですか？')) return;
+    keys.forEach(k => localStorage.removeItem(k));
+    location.reload();
+  }
+
+  // localStorage を全消去してリロード
+  function debugResetAll(){
+    if(!confirm('全localStorageデータを消去してリロードします。\nニックネーム・称号・設定・端末IDがすべてリセットされます。\n\n※ Firebaseのスコアは残ります')) return;
+    localStorage.clear();
+    location.href = 'index.html';
+  }
+
+  // localStorage の内容を表示
+  function debugShowStorage(){
+    const log = document.getElementById('debug-log');
+    const keys = ['adgame_nick','adgame_nick_changed','adgame_device_id','adgame_titles','adgame_disp','adgame_ad_locked','adgame_ad_row_hidden'];
+    const lines = keys.map(k => {
+      const v = localStorage.getItem(k);
+      if(v === null) return k + ' : (未設定)';
+      try { return k + ' :\n  ' + JSON.stringify(JSON.parse(v), null, 2); }
+      catch { return k + ' : ' + v; }
+    });
+    log.textContent = lines.join('\n\n');
+    log.style.display = 'block';
+  }
 </script>
 </body>
 </html>
