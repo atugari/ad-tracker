@@ -363,13 +363,18 @@
           el.appendChild(row);
         });
       }
-      renderRows(top10);
-      if(all100.length>10){
-        const btn=document.createElement('button');
-        btn.className='more-btn';
-        btn.textContent='100位まで表示（全'+all100.length+'件）';
-        btn.onclick=()=>{renderRows(all100);btn.remove();};
-        el.appendChild(btn);
+      // 全期間タブは全件表示、week/dayは10件+もっと見るボタン
+      if(tab==='all'){
+        renderRows(all100);
+      } else {
+        renderRows(top10);
+        if(all100.length>10){
+          const btn=document.createElement('button');
+          btn.className='more-btn';
+          btn.textContent='100位まで表示（全'+all100.length+'件）';
+          btn.onclick=()=>{renderRows(all100);btn.remove();};
+          el.appendChild(btn);
+        }
       }
     }catch(e){
       el.innerHTML='<div class="rank-empty">読み込みに失敗しました</div>';
@@ -401,6 +406,24 @@
     const val=document.getElementById('nick-input').value.trim();
     const msgEl=document.getElementById('nick-msg');
     if(!val){msgEl.textContent='ニックネームを入力してください';msgEl.style.color='var(--accent)';return;}
+
+    // 30日制限チェック（サーバー側でなくlocalStorageで管理）
+    const savedNick2=localStorage.getItem('adgame_nick');
+    const lastChangeStr2=localStorage.getItem('adgame_nick_changed');
+    const lastChange2=lastChangeStr2?parseInt(lastChangeStr2):0;
+    const CHANGE_LIMIT2=30*24*60*60*1000;
+    if(savedNick2 && val!==savedNick2){
+      const daysSince=Math.floor((Date.now()-lastChange2)/(24*60*60*1000));
+      const daysLeft=30-daysSince;
+      if(Date.now()-lastChange2<CHANGE_LIMIT2){
+        msgEl.textContent='ニックネームは変更できません。あと'+daysLeft+'日後に変更できます。';
+        msgEl.style.color='var(--accent)';
+        // 強制的に元のニックネームに戻す
+        document.getElementById('nick-input').value=savedNick2;
+        return;
+      }
+    }
+
     msgEl.textContent='確認中...';msgEl.style.color='var(--text3)';
 
     // 既存データの端末IDをチェック
@@ -421,6 +444,11 @@
       msgEl.textContent='';
     }
 
+    // ニックネームが変わった場合は変更日時を記録
+    const prevNick=localStorage.getItem('adgame_nick');
+    if(!prevNick || val!==prevNick){
+      localStorage.setItem('adgame_nick_changed', Date.now().toString());
+    }
     nickname=val;
     localStorage.setItem('adgame_nick',val);
     stageIdx=0;stageScores=[0,0,0];totalScore=0;
