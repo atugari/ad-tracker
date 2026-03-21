@@ -666,41 +666,79 @@
   function getCfg(){return LEVEL_CFG[STAGE_LEVELS[stageIdx]];}
   function randomTypes(n){const p=['gold','silver','red'];return Array.from({length:n},()=>p[Math.floor(Math.random()*p.length)]);}
 
-  // 予約ニックネーム（製作者専用端末IDのみ使用可能）
-  // 製作者の端末IDがまだFirebaseに登録されていない場合は初回登録を許可し、
-  // 登録済みの場合は同じ端末IDからのみ使用を許可する。
+  // ===== 製作者認証システム =====
+  // パスワードをPBKDF2(100,000回)でストレッチングしたハッシュ。
+  // gen_hash.html でパスワードを入力して生成した値をここに貼る。
+  // ハッシュからパスワードを逆算するのは現実的に不可能。
+  const _OWNER_HASH = 'aa774ac51d1ddc98a5b325605ce19c848114f7d82959b88385cf654466405b5b'; // ← gen_hash.html で生成した値に差し替える
+  const _OWNER_SALT = '丸場所記憶ゲーム_製作者専用_2026_SALT_v1';
+  const _AUTH_SESSION_KEY = 'adgame_owner_auth'; // sessionStorage（タブを閉じると消える）
+
   const RESERVED_NICKS = ['製作者'];
+
+  // パスワードをPBKDF2でハッシュ化
+  async function _hashPassword(pw){
+    try {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', enc.encode(pw), {name:'PBKDF2'}, false, ['deriveBits']
+      );
+      const bits = await crypto.subtle.deriveBits(
+        {name:'PBKDF2', salt:enc.encode(_OWNER_SALT), iterations:100000, hash:'SHA-256'},
+        keyMaterial, 256
+      );
+      return Array.from(new Uint8Array(bits))
+        .map(b => b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { return null; }
+  }
+
+  // 製作者認証済みかチェック（sessionStorageで保持）
+  function _isOwnerAuthed(){
+    return sessionStorage.getItem(_AUTH_SESSION_KEY) === '1';
+  }
+
+  // 製作者パスワード認証（成功したらsessionStorageにセット）
+  async function _authOwner(purpose){
+    // 既に認証済みならスキップ
+    if(_isOwnerAuthed()) return true;
+
+    // ハッシュ未設定の場合（初期状態）は認証をスキップ
+    if(_OWNER_HASH === 'YOUR_HASH_HERE'){
+      sessionStorage.setItem(_AUTH_SESSION_KEY, '1');
+      return true;
+    }
+
+    const pw = prompt('「' + purpose + '」には製作者パスワードが必要です。\nパスワードを入力してください：');
+    if(!pw) return false;
+
+    const hash = await _hashPassword(pw);
+    if(!hash){ alert('認証エラーが発生しました。'); return false; }
+
+    if(hash === _OWNER_HASH){
+      sessionStorage.setItem(_AUTH_SESSION_KEY, '1');
+      return true;
+    } else {
+      alert('パスワードが違います。');
+      return false;
+    }
+  }
 
   async function startChallenge(){
     const val=document.getElementById('nick-input').value.trim();
     const msgEl=document.getElementById('nick-msg');
     if(!val){msgEl.textContent='ニックネームを入力してください';msgEl.style.color='var(--accent)';return;}
 
-    // 予約ニックネームチェック
+    // 予約ニックネームチェック → パスワード認証
     if(RESERVED_NICKS.includes(val)){
-      msgEl.textContent='確認中...';msgEl.style.color='var(--text3)';
-      try{
-        const key=encodeURIComponent(val.replace(/[.#$[\]/]/g,'_'));
-        const res=await fetch(DB_URL+'/rankings/'+key+'.json');
-        const existing=await res.json();
-        const now=Date.now();
-        const isExpired=existing&&(now-existing.updatedAt)>ONE_YEAR;
-        // Firebaseに登録済み & 期限切れでない & 別端末 → 使用不可
-        if(existing&&!isExpired&&existing.deviceId&&existing.deviceId!==DEVICE_ID){
-          msgEl.textContent='「'+val+'」は使用できません。';
-          msgEl.style.color='var(--accent)';
-          return;
-        }
-        // 未登録 or 期限切れ or 同じ端末 → 続行
-      }catch(e){
-        // ネットワークエラー時は予約名を使わせない（安全側に倒す）
-        msgEl.textContent='確認できませんでした。ネットワークを確認してください。';
+      msgEl.textContent='認証中...';msgEl.style.color='var(--text3)';
+      const authed = await _authOwner('「' + val + '」の使用');
+      if(!authed){
+        msgEl.textContent='「'+val+'」は使用できません。';
         msgEl.style.color='var(--accent)';
         return;
       }
+      msgEl.textContent='認証済み';msgEl.style.color='var(--green)';
     }
-
-    // 30日制限チェック（サーバー側でなくlocalStorageで管理）
     const savedNick2=localStorage.getItem('adgame_nick');
     const lastChangeStr2=localStorage.getItem('adgame_nick_changed');
     const lastChange2=lastChangeStr2?parseInt(lastChangeStr2):0;
@@ -1093,6 +1131,18 @@
   }
 
   function initDispSettings() {
+    // AD_LOCKED_KEYがないのにadgame_dispのadがfalseになっている場合は修正
+    // （デバッグリセット後などに広告が非表示のままになる問題を防ぐ）
+    if(!localStorage.getItem(AD_LOCKED_KEY)){
+      try {
+        const disp = JSON.parse(localStorage.getItem('adgame_disp') || '{}');
+        if(disp.ad === false){
+          disp.ad = true;
+          localStorage.setItem('adgame_disp', JSON.stringify(disp));
+        }
+      } catch(e) {}
+    }
+
     const s = getDispSettings();
     document.getElementById('tog-ad').checked     = s.ad;
     document.getElementById('tog-banner').checked = s.banner;
