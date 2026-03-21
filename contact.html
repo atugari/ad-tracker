@@ -3,60 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>お問い合わせ｜丸場所記憶ゲーム</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>お問い合わせ | 丸場所記憶ゲーム</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    :root{--bg:#f7f6f2;--surface:#fff;--surface2:#f0efe9;--border2:rgba(0,0,0,0.06);--text:#1a1a18;--text2:#6b6b65;--text3:#a8a8a2;--green:#1D9E75;--r:14px;--rs:8px;}
+    :root{--bg:#f7f6f2;--surface:#fff;--surface2:#f0efe9;--border2:rgba(0,0,0,0.06);--text:#1a1a18;--text2:#6b6b65;--text3:#a8a8a2;--green:#1D9E75;--blue:#378ADD;--accent:#D85A30;--r:14px;--rs:8px;}
     @media(prefers-color-scheme:dark){:root{--bg:#141412;--surface:#1e1e1b;--surface2:#28281f;--border2:rgba(255,255,255,0.06);--text:#f0efe9;--text2:#9a9a92;--text3:#5a5a54;}}
-    body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.8;min-height:100dvh;}
-    .wrap{max-width:640px;margin:0 auto;padding:32px 20px 64px;}
-    .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:24px;}
-    h1{font-size:22px;font-weight:500;margin-bottom:6px;}
-    .sub{font-size:13px;color:var(--text3);margin-bottom:28px;}
-    .card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:20px 24px;margin-bottom:16px;}
-    .card h2{font-size:15px;font-weight:500;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2);}
-    .card p{font-size:13px;color:var(--text2);line-height:1.9;margin-bottom:12px;}
-    .card p:last-child{margin-bottom:0;}
-    .form-btn{display:inline-block;font-size:14px;font-weight:500;padding:12px 24px;background:var(--green);color:#fff;border-radius:var(--rs);text-decoration:none;margin-top:4px;}
-    .note{font-size:12px;color:var(--text3);margin-top:10px;line-height:1.7;}
-    footer{margin-top:32px;text-align:center;font-size:11px;color:var(--text3);line-height:2.2;}
+    body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.6;min-height:100dvh;}
+    .app{max-width:420px;margin:0 auto;padding:16px 16px 48px;}
+    .page-header{display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border2);}
+    .back-btn{font-size:20px;text-decoration:none;color:var(--text2);line-height:1;}
+    .page-title{font-size:18px;font-weight:500;}
+    .card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+    .card-title{font-size:14px;font-weight:500;margin-bottom:8px;color:var(--text);}
+    .card-desc{font-size:12px;color:var(--text2);line-height:1.9;margin-bottom:12px;}
+    .card-desc:last-child{margin-bottom:0;}
+    label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;margin-top:12px;}
+    label:first-of-type{margin-top:0;}
+    select,textarea,input[type=text]{width:100%;font-size:13px;padding:10px 12px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:'Noto Sans JP',sans-serif;-webkit-appearance:none;}
+    select:focus,textarea:focus,input[type=text]:focus{outline:none;border-color:var(--blue);}
+    textarea{resize:vertical;min-height:120px;line-height:1.7;}
+    .char-count{font-size:11px;color:var(--text3);text-align:right;margin-top:3px;}
+    .submit-btn{display:block;width:100%;padding:13px 0;border-radius:var(--r);border:none;background:var(--green);font-size:15px;font-weight:500;color:#fff;cursor:pointer;font-family:'Noto Sans JP',sans-serif;margin-top:16px;transition:background 0.1s;}
+    .submit-btn:hover{background:#0F6E56;}
+    .submit-btn:active{transform:scale(0.98);}
+    .submit-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .notice{font-size:11px;color:var(--text3);line-height:1.8;margin-top:10px;text-align:center;}
+    .success-msg{display:none;background:rgba(29,158,117,0.08);border:1px solid rgba(29,158,117,0.3);border-radius:var(--rs);padding:14px;font-size:13px;color:var(--green);text-align:center;line-height:1.8;margin-top:12px;}
+    .info-row{display:flex;gap:10px;margin-bottom:6px;font-size:12px;color:var(--text2);}
+    .info-label{color:var(--text3);flex-shrink:0;width:80px;}
+    footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border2);text-align:center;font-size:11px;color:var(--text3);line-height:2.2;}
     footer a{color:var(--text3);text-decoration:underline;}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <a href="index.html" class="back">← 丸場所記憶ゲームに戻る</a>
-  <h1>お問い合わせ</h1>
-  <p class="sub">ご質問・ご要望・不具合の報告はこちらからどうぞ。</p>
-
-  <div class="card">
-    <h2>お問い合わせフォーム</h2>
-    <p>以下のボタンからGoogleフォームでお問い合わせいただけます。通常2〜3営業日以内にご返信します。</p>
-    <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdbacPHgX8rHwqWU9eiVME2p23hk7TXFC1OX8FmML6Gc5Kpiw/viewform?usp=dialog" target="_blank" rel="noopener">お問い合わせフォームを開く</a>
-    <p class="note">※ タップするとGoogleフォームが開きます。フォームの回答内容以外の情報は収集しません。</p>
+<div class="app">
+  <div class="page-header">
+    <a class="back-btn" href="index.html">←</a>
+    <span class="page-title">お問い合わせ</span>
   </div>
 
   <div class="card">
-    <h2>お問い合わせの前に</h2>
-    <p>多くの疑問は<a href="faq.html" style="color:var(--text2)">よくある質問</a>や<a href="guide.html" style="color:var(--text2)">使い方ガイド</a>で解決できます。まずそちらをご確認ください。</p>
+    <div class="card-desc">不具合の報告・ご意見・ご質問などはこちらからお送りください。内容を確認の上、対応いたします。返信が必要な場合はメールアドレスをご記入ください。</div>
   </div>
 
   <div class="card">
-    <h2>よくあるお問い合わせ</h2>
-    <p style="font-weight:500;margin-bottom:4px">ランキングが表示されない</p>
-    <p>通信環境を確認してページを再読み込みしてください。</p>
-    <p style="font-weight:500;margin-bottom:4px;margin-top:12px">ニックネームを変更したい</p>
-    <p>別のニックネームで新たにプレイすると新しいランキングが登録されます。古いニックネームのデータは1年後に自動削除されます。</p>
-    <p style="font-weight:500;margin-bottom:4px;margin-top:12px">スコアが記録されていない</p>
-    <p>3ステージすべてクリアした場合のみスコアが登録されます。途中でやめた場合は記録されません。</p>
+    <label>お問い合わせの種類</label>
+    <select id="contact-type">
+      <option value="">選択してください</option>
+      <option value="bug">不具合・バグの報告</option>
+      <option value="cheat">チート判定された（身に覚えがない）</option>
+      <option value="nick">ニックネームについて</option>
+      <option value="ranking">ランキングについて</option>
+      <option value="suggest">改善のご提案</option>
+      <option value="other">その他</option>
+    </select>
+
+    <label>お問い合わせ内容</label>
+    <textarea id="contact-body" placeholder="できるだけ詳しくご記入ください。不具合の場合は、いつ・どんな操作をした時に起きたか教えていただけると助かります。" oninput="updateCount()"></textarea>
+    <div class="char-count"><span id="char-count">0</span> / 1000文字</div>
+
+    <label>メールアドレス（返信が必要な場合）</label>
+    <input type="text" id="contact-email" placeholder="例：example@email.com（任意）">
+
+    <button class="submit-btn" id="submit-btn" onclick="submitContact()">送信する</button>
+    <div class="notice">※ お問い合わせ内容はFirebaseに保存されます。個人情報は返信目的以外には使用しません。</div>
+    <div class="success-msg" id="success-msg">
+      お問い合わせを受け付けました。<br>ご連絡ありがとうございます。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">よくある質問</div>
+    <div class="card-desc">お問い合わせ前に<a href="faq.html" style="color:var(--blue);">よくある質問</a>もご確認ください。すでに回答がある場合があります。</div>
   </div>
 
   <footer>
-    <a href="index.html">トップに戻る</a>　|　<a href="guide.html">使い方ガイド</a>　|　<a href="faq.html">よくある質問</a>　|　<a href="privacy.html">プライバシーポリシー</a><br>
+    <a href="index.html">ホーム</a>　|　
+    <a href="privacy.html">プライバシーポリシー</a>　|　
+    <a href="guide.html">使い方ガイド</a>　|　
+    <a href="faq.html">よくある質問</a>　|　
+    <a href="settings.html">設定</a>　|　<a href="share.html">自慢する</a><br>
     &copy; 2026 丸場所記憶ゲーム
   </footer>
 </div>
+<script>
+  const DB_URL = 'https://ad-game-7b40a-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+  function updateCount(){
+    const len = document.getElementById('contact-body').value.length;
+    document.getElementById('char-count').textContent = len;
+  }
+
+  async function submitContact(){
+    const type  = document.getElementById('contact-type').value;
+    const body  = document.getElementById('contact-body').value.trim();
+    const email = document.getElementById('contact-email').value.trim();
+
+    if(!type){ alert('お問い合わせの種類を選択してください。'); return; }
+    if(!body){ alert('お問い合わせ内容を入力してください。'); return; }
+    if(body.length > 1000){ alert('1000文字以内でご入力ください。'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    try {
+      const key = 'contact_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
+      const nick = localStorage.getItem('adgame_nick') || '（未登録）';
+      const deviceId = localStorage.getItem('adgame_device_id') || '不明';
+
+      await fetch(DB_URL + '/contacts/' + key + '.json', {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          type,
+          body,
+          email: email || null,
+          nick,
+          deviceId,
+          sentAt: Date.now(),
+          ua: navigator.userAgent.slice(0,100),
+        })
+      });
+
+      btn.style.display = 'none';
+      document.getElementById('success-msg').style.display = 'block';
+
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = '送信する';
+      alert('送信に失敗しました。ネットワーク接続を確認してください。');
+    }
+  }
+</script>
 </body>
 </html>
