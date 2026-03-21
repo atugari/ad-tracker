@@ -256,8 +256,13 @@
     render(myIds, myMap);
 
     if(TITLE_DEFS.length===0 || myIds.size===0){
-      document.getElementById('airride-overlay').style.display='none';
-      document.getElementById('main-app').style.opacity='1';
+      const ov=document.getElementById('airride-overlay');
+      ov.style.transition='none';
+      ov.style.opacity='0';
+      ov.style.display='none';
+      const app=document.getElementById('main-app');
+      app.style.transition='none';
+      app.style.opacity='1';
       return;
     }
     runAirride(myIds);
