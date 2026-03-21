@@ -73,15 +73,20 @@
     .debug-hd{background:#1a1a18;color:#f0efe9;padding:14px 16px;font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
     .debug-hd span{font-size:10px;color:#888;font-weight:400;margin-left:6px;}
     .debug-close{background:none;border:none;color:#888;font-size:18px;cursor:pointer;padding:0 4px;}
-    .debug-section{padding:12px 16px;border-bottom:1px solid var(--border2);}
+    .debug-section{padding:14px 16px;border-bottom:1px solid var(--border2);}
     .debug-section:last-child{border-bottom:none;}
-    .debug-section-title{font-size:11px;color:var(--text3);letter-spacing:0.06em;margin-bottom:8px;font-weight:500;}
-    .debug-btn{display:block;width:100%;padding:9px 12px;margin-bottom:6px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface2);font-size:13px;color:var(--text);cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;transition:background 0.1s;}
+    .debug-section-title{font-size:12px;color:var(--text);font-weight:500;margin-bottom:4px;}
+    .debug-section-note{font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.7;}
+    .debug-btn{display:block;width:100%;padding:10px 12px;margin-bottom:6px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface2);font-size:13px;color:var(--text);cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;transition:background 0.1s;line-height:1.5;}
     .debug-btn:last-child{margin-bottom:0;}
     .debug-btn:hover{background:var(--surface);}
+    .debug-btn .btn-title{font-weight:500;display:block;}
+    .debug-btn .btn-desc{font-size:11px;color:var(--text3);display:block;margin-top:2px;}
     .debug-btn.danger{border-color:var(--accent);color:var(--accent);background:none;}
     .debug-btn.danger:hover{background:rgba(216,90,48,0.06);}
+    .debug-btn.danger .btn-desc{color:rgba(216,90,48,0.7);}
     .debug-btn.ok{border-color:var(--green);color:var(--green);background:none;}
+    .debug-btn.ok .btn-desc{color:rgba(29,158,117,0.7);}
     .debug-log{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface2);border-radius:var(--rs);padding:10px 12px;max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;margin-top:8px;line-height:1.7;}
     .debug-nick-row{display:flex;gap:6px;margin-bottom:6px;}
     .debug-nick-input{flex:1;font-size:13px;padding:8px 10px;border-radius:var(--rs);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-family:'Noto Sans JP',sans-serif;}
@@ -95,39 +100,74 @@
 <div id="debug-panel">
   <div class="debug-inner">
     <div class="debug-hd">
-      <div>デバッグモード<span>※ 開発者専用</span></div>
+      <div>製作者デバッグモード<span>※ 称号ページのタイトルを5回タップで開く</span></div>
       <button class="debug-close" onclick="closeDebug()">✕</button>
     </div>
 
-    <!-- Firebase スコア削除 -->
+    <!-- 1. ランキング削除 -->
     <div class="debug-section">
-      <div class="debug-section-title">FIREBASE — ランキングデータ削除</div>
+      <div class="debug-section-title">ランキングのスコアを削除する</div>
+      <div class="debug-section-note">
+        サーバー（Firebase）に保存されているランキングスコアを消します。<br>
+        ・テストプレイのスコアを消したい時<br>
+        ・名前を変えて一から登録し直したい時<br>
+        ・端末IDをリセットした後に同じ名前を使いたい時<br>
+        ※ 名前を入力して「削除」を押すと、その名前のスコアがランキングから消えます。消したら2位以下が自動で繰り上がります。
+      </div>
       <div class="debug-nick-row">
         <input class="debug-nick-input" id="debug-nick" placeholder="ニックネームを入力（例：製作者）">
-        <button class="debug-btn danger" style="width:auto;padding:8px 12px;margin:0;" onclick="debugDeleteFirebase()">削除</button>
+        <button class="debug-btn danger" style="width:auto;padding:8px 14px;margin:0;display:inline-block;" onclick="debugDeleteFirebase()">削除</button>
       </div>
       <div class="debug-status" id="debug-fb-status"></div>
     </div>
 
-    <!-- localStorage 個別リセット -->
+    <!-- 2. 項目別リセット -->
     <div class="debug-section">
-      <div class="debug-section-title">LOCALSTORAGE — 項目別リセット</div>
-      <button class="debug-btn" onclick="debugReset('adgame_nick','adgame_nick_changed')">ニックネームをリセット</button>
-      <button class="debug-btn" onclick="debugReset('adgame_titles')">称号をリセット</button>
-      <button class="debug-btn" onclick="debugReset('adgame_disp','adgame_ad_locked','adgame_ad_row_hidden','adgame_sections_hidden','adgame_banner_hidden')">表示設定をリセット</button>
-      <button class="debug-btn" onclick="debugReset('adgame_device_id')">端末IDをリセット（新規ユーザー扱いに）</button>
+      <div class="debug-section-title">項目を選んでリセットする</div>
+      <div class="debug-section-note">必要な部分だけをリセットできます。リセット後は自動でページが再読み込みされます。</div>
+
+      <button class="debug-btn" onclick="debugReset('adgame_nick','adgame_nick_changed')">
+        <span class="btn-title">ニックネームをリセット</span>
+        <span class="btn-desc">登録した名前と「30日間変更できない」制限を消します。次回から好きな名前で登録できるようになります。※ ランキングのスコアは消えません。</span>
+      </button>
+
+      <button class="debug-btn" onclick="debugResetTitles()">
+        <span class="btn-title">称号をリセット</span>
+        <span class="btn-desc">入手した称号をすべて消して0個の状態に戻します。広告トグルのロックや非表示設定も一緒に解除されるので、広告を消そうとして称号を再入手できる状態になります。</span>
+      </button>
+
+      <button class="debug-btn" onclick="debugReset('adgame_disp','adgame_ad_locked','adgame_ad_row_hidden','adgame_sections_hidden','adgame_banner_hidden')">
+        <span class="btn-title">ホームの表示設定をリセット</span>
+        <span class="btn-desc">ホームの「表示設定」で変えた内容（広告・ランキング・称号・ゲームカードのON/OFF）をすべて初期状態（全表示）に戻します。</span>
+      </button>
+
+      <button class="debug-btn" onclick="debugReset('adgame_device_id')">
+        <span class="btn-title">端末IDをリセット</span>
+        <span class="btn-desc">この端末に割り当てられているIDを新しく作り直します。完全に新規プレイヤーとして扱われます。※ 同じニックネームを引き続き使いたい場合は、先に上の「ランキングのスコアを削除する」でサーバーのデータを消してください。消さないと「別の端末で使用中」エラーが出ます。</span>
+      </button>
     </div>
 
-    <!-- localStorage 完全リセット -->
+    <!-- 3. 完全リセット -->
     <div class="debug-section">
-      <div class="debug-section-title">LOCALSTORAGE — 完全リセット</div>
-      <button class="debug-btn danger" onclick="debugResetAll()">全データを消去してリロード</button>
+      <div class="debug-section-title">この端末のデータをすべて消す</div>
+      <div class="debug-section-note">
+        ニックネーム・称号・表示設定・端末IDをまとめて全消去します。完全に一からやり直せます。<br>
+        ※ サーバー（Firebase）のランキングスコアは消えません。スコアも消したい場合は先に上の「ランキングのスコアを削除する」を使ってください。
+      </div>
+      <button class="debug-btn danger" onclick="debugResetAll()">
+        <span class="btn-title">端末内の全データを消去してホームへ戻る</span>
+        <span class="btn-desc">取り消しできません。実行後はホーム画面に戻り、初回起動と同じ状態になります。</span>
+      </button>
     </div>
 
-    <!-- 現在のデータ確認 -->
+    <!-- 4. データ確認 -->
     <div class="debug-section">
-      <div class="debug-section-title">現在の LOCALSTORAGE</div>
-      <button class="debug-btn ok" onclick="debugShowStorage()">データを表示</button>
+      <div class="debug-section-title">現在の保存データを確認する</div>
+      <div class="debug-section-note">この端末に今どんなデータが保存されているかを一覧で表示します。不具合の原因を調べる時などに使います。</div>
+      <button class="debug-btn ok" onclick="debugShowStorage()">
+        <span class="btn-title">保存データを表示</span>
+        <span class="btn-desc">ニックネーム・称号・設定・端末IDなどの現在の値を確認できます。</span>
+      </button>
       <div class="debug-log" id="debug-log" style="display:none"></div>
     </div>
 
@@ -317,6 +357,8 @@
   }
 
   // ===== 初期化 =====
+  const AIRRIDE_SEEN_KEY = 'adgame_airride_seen';
+
   (function init(){
     const myTitles = getMyTitles();
     const myIds    = new Set(myTitles.map(t=>t.id));
@@ -325,10 +367,23 @@
 
     render(myIds, myMap);
 
-    // 称号データがない or 未入手なら演出なしでそのまま表示
+    // 称号データがない or 未入手なら演出なし
     if(TITLE_DEFS.length === 0 || myIds.size === 0) return;
 
-    // 称号がある時だけオーバーレイを表示して演出
+    // 既に演出済みの称号IDセットを取得
+    let seenIds;
+    try { seenIds = new Set(JSON.parse(localStorage.getItem(AIRRIDE_SEEN_KEY) || '[]')); }
+    catch(e) { seenIds = new Set(); }
+
+    // 未視聴の入手済み称号があるか確認
+    const hasUnseen = [...myIds].some(id => !seenIds.has(id));
+    if(!hasUnseen) return; // 全部見済みなら演出なし
+
+    // 演出後に全称号を「見済み」に記録
+    const allIds = JSON.stringify([...myIds]);
+    localStorage.setItem(AIRRIDE_SEEN_KEY, allIds);
+
+    // オーバーレイを表示して演出
     const ov = document.getElementById('airride-overlay');
     ov.style.display = 'flex';
     runAirride(myIds);
@@ -336,6 +391,48 @@
 
   // ===== デバッグモード =====
   const DB_URL = 'https://ad-game-7b40a-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+  // index.htmlと同じハッシュ・ソルト・セッションキーを使う
+  const _OWNER_HASH = 'aa774ac51d1ddc98a5b325605ce19c848114f7d82959b88385cf654466405b5b'; // ← index.htmlと同じ値を設定すること
+  const _OWNER_SALT = '丸場所記憶ゲーム_製作者専用_2026_SALT_v1';
+  const _AUTH_SESSION_KEY = 'adgame_owner_auth';
+
+  async function _hashPassword(pw){
+    try {
+      const enc = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', enc.encode(pw), {name:'PBKDF2'}, false, ['deriveBits']
+      );
+      const bits = await crypto.subtle.deriveBits(
+        {name:'PBKDF2', salt:enc.encode(_OWNER_SALT), iterations:100000, hash:'SHA-256'},
+        keyMaterial, 256
+      );
+      return Array.from(new Uint8Array(bits))
+        .map(b => b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { return null; }
+  }
+
+  function _isOwnerAuthed(){
+    return sessionStorage.getItem(_AUTH_SESSION_KEY) === '1';
+  }
+
+  async function _authOwner(){
+    if(_isOwnerAuthed()) return true;
+    if(_OWNER_HASH === 'YOUR_HASH_HERE'){
+      sessionStorage.setItem(_AUTH_SESSION_KEY, '1');
+      return true;
+    }
+    const pw = prompt('デバッグモードを開くには製作者パスワードが必要です。\nパスワードを入力してください：');
+    if(!pw) return false;
+    const hash = await _hashPassword(pw);
+    if(!hash){ alert('認証エラーが発生しました。'); return false; }
+    if(hash === _OWNER_HASH){
+      sessionStorage.setItem(_AUTH_SESSION_KEY, '1');
+      return true;
+    }
+    alert('パスワードが違います。');
+    return false;
+  }
 
   // タイトルを5回タップで開く
   let tapCount = 0, tapTimer = null;
@@ -350,11 +447,12 @@
     }
   });
 
-  function openDebug(){
+  async function openDebug(){
+    const authed = await _authOwner();
+    if(!authed) return;
     document.getElementById('debug-panel').style.display = 'block';
     document.getElementById('debug-fb-status').textContent = '';
     document.getElementById('debug-log').style.display = 'none';
-    // 現在のニックネームをデフォルト入力
     const savedNick = localStorage.getItem('adgame_nick') || '';
     document.getElementById('debug-nick').value = savedNick;
   }
@@ -381,6 +479,25 @@
     } catch(e) {
       status.style.color='var(--accent)'; status.textContent = 'エラー: '+e.message;
     }
+  }
+
+  // 称号専用リセット（関連する全キーをまとめて消す）
+  function debugResetTitles(){
+    if(!confirm('称号・広告ロック・演出済みフラグをすべてリセットします。\nよろしいですか？')) return;
+    const keys = [
+      'adgame_titles',       // 入手済み称号
+      'adgame_ad_locked',    // 広告トグルのロック
+      'adgame_ad_row_hidden',// 広告トグル行の非表示
+      'adgame_airride_seen', // 演出済みフラグ
+    ];
+    keys.forEach(k => localStorage.removeItem(k));
+    // adgame_disp の ad フラグを true に戻す（広告を表示状態に）
+    try {
+      const disp = JSON.parse(localStorage.getItem('adgame_disp') || '{}');
+      disp.ad = true;
+      localStorage.setItem('adgame_disp', JSON.stringify(disp));
+    } catch(e) {}
+    location.reload();
   }
 
   // localStorageの指定キーを削除してリロード
