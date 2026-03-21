@@ -108,6 +108,26 @@
 
   <!-- ニックネーム画面 -->
   <div class="screen active" id="screen-nick">
+
+    <!-- 月間ランキングバナー -->
+    <div id="monthly-banner" style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);overflow:hidden;margin-bottom:16px;">
+      <div style="background:linear-gradient(135deg,#1D9E75,#0F6E56);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:2px;">🏆 今月のランキング</div>
+          <div style="font-size:16px;font-weight:500;color:#fff;" id="banner-month-label"></div>
+        </div>
+        <button onclick="hideBanner()" style="font-size:11px;color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.15);border:none;border-radius:var(--rs);padding:4px 10px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;">非表示</button>
+      </div>
+      <div class="rank-tabs" style="border-bottom:1px solid var(--border2);">
+        <button class="rank-tab active" id="banner-tab-month" onclick="switchBannerTab('month')">今月</button>
+        <button class="rank-tab" id="banner-tab-all" onclick="switchBannerTab('all')">歴代</button>
+        <button class="rank-tab" id="banner-tab-week" onclick="switchBannerTab('week')">今週</button>
+        <button class="rank-tab" id="banner-tab-day" onclick="switchBannerTab('day')">今日</button>
+      </div>
+      <div style="max-height:260px;overflow-y:auto;" id="banner-rank-list"><div class="rank-loading">読み込み中...</div></div>
+    </div>
+    <button id="show-banner-btn" onclick="showBanner()" style="display:none;width:100%;margin-bottom:12px;padding:8px;font-size:12px;color:var(--text3);background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">🏆 月間ランキングを表示する</button>
+
     <div class="nick-card">
       <h1>丸場所記憶ゲーム</h1>
       <p>Lv.5 → Lv.7 → Lv.10 の順に挑戦！<br>丸が全部消えたら<strong>5秒以内</strong>にタップして答えよう。<br>3ステージの合計スコアでランキングを競おう！</p>
@@ -119,7 +139,8 @@
     <div class="ranking-card">
       <div class="ranking-header">ランキング<button class="ranking-refresh" onclick="loadRanking(currentRankTab)">更新</button></div>
       <div class="rank-tabs">
-        <button class="rank-tab active" onclick="switchRankTab('all')">全期間</button>
+        <button class="rank-tab active" onclick="switchRankTab('all')">歴代</button>
+        <button class="rank-tab" onclick="switchRankTab('month')">今月</button>
         <button class="rank-tab" onclick="switchRankTab('week')">今週</button>
         <button class="rank-tab" onclick="switchRankTab('day')">今日</button>
       </div>
@@ -184,7 +205,8 @@
     <div class="ranking-card">
       <div class="ranking-header">ランキング<button class="ranking-refresh" onclick="loadRanking(currentRankTab)">更新</button></div>
       <div class="rank-tabs">
-        <button class="rank-tab active" onclick="switchRankTab('all')">全期間</button>
+        <button class="rank-tab active" onclick="switchRankTab('all')">歴代</button>
+        <button class="rank-tab" onclick="switchRankTab('month')">今月</button>
         <button class="rank-tab" onclick="switchRankTab('week')">今週</button>
         <button class="rank-tab" onclick="switchRankTab('day')">今日</button>
       </div>
@@ -203,6 +225,7 @@
 <script>
   const DB_URL='https://ad-game-7b40a-default-rtdb.asia-southeast1.firebasedatabase.app';
   const ONE_YEAR=365*24*60*60*1000;
+  const ONE_MONTH=30*24*60*60*1000;
   const ONE_WEEK=7*24*60*60*1000;
   const ONE_DAY=24*60*60*1000;
 
@@ -236,7 +259,8 @@
     currentRankTab=tab;
     document.querySelectorAll('.rank-tab').forEach(b=>{
       b.classList.toggle('active',
-        (tab==='all'&&b.textContent==='全期間')||
+        (tab==='all'&&b.textContent==='歴代')||
+        (tab==='month'&&b.textContent==='今月')||
         (tab==='week'&&b.textContent==='今週')||
         (tab==='day'&&b.textContent==='今日')
       );
@@ -335,6 +359,7 @@
       let entries=Object.values(data).filter(e=>{
         if(!e||!e.score)return false;
         if((now-e.updatedAt)>ONE_YEAR)return false;
+        if(tab==='month')return(now-e.updatedAt)<=ONE_MONTH;
         if(tab==='week')return(now-e.updatedAt)<=ONE_WEEK;
         if(tab==='day')return(now-e.updatedAt)<=ONE_DAY;
         return true;
@@ -363,8 +388,8 @@
           el.appendChild(row);
         });
       }
-      // 全期間タブは全件表示、week/dayは10件+もっと見るボタン
-      if(tab==='all'){
+      // 全期間・月間タブは全件表示、week/dayは10件+もっと見るボタン
+      if(tab==='all'||tab==='month'){
         renderRows(all100);
       } else {
         renderRows(top10);
@@ -682,6 +707,86 @@
       document.getElementById('nick-msg').textContent='前回のニックネームを復元しました（変更可能）';
       document.getElementById('nick-msg').style.color='var(--text3)';
     }
+  }
+
+  // 月間ランキングバナー
+  let currentBannerTab = 'month';
+
+  function getBannerMonthLabel() {
+    const now = new Date();
+    return now.getFullYear() + '年' + (now.getMonth()+1) + '月';
+  }
+
+  function hideBanner() {
+    document.getElementById('monthly-banner').style.display = 'none';
+    document.getElementById('show-banner-btn').style.display = 'block';
+    localStorage.setItem('adgame_banner_hidden', '1');
+  }
+
+  function showBanner() {
+    document.getElementById('monthly-banner').style.display = 'block';
+    document.getElementById('show-banner-btn').style.display = 'none';
+    localStorage.removeItem('adgame_banner_hidden');
+    loadBannerRanking(currentBannerTab);
+  }
+
+  function switchBannerTab(tab) {
+    currentBannerTab = tab;
+    ['month','all','week','day'].forEach(t => {
+      const btn = document.getElementById('banner-tab-'+t);
+      if(btn) btn.classList.toggle('active', t===tab);
+    });
+    loadBannerRanking(tab);
+  }
+
+  async function loadBannerRanking(tab) {
+    const el = document.getElementById('banner-rank-list');
+    if(!el) return;
+    el.innerHTML = '<div class="rank-loading">読み込み中...</div>';
+    try {
+      const res = await fetch(DB_URL+'/rankings.json');
+      const data = await res.json();
+      if(!data){el.innerHTML='<div class="rank-empty">まだ記録がありません</div>';return;}
+      const now = Date.now();
+      let entries = Object.values(data).filter(e=>{
+        if(!e||!e.score)return false;
+        if((now-e.updatedAt)>ONE_YEAR)return false;
+        if(tab==='month')return(now-e.updatedAt)<=ONE_MONTH;
+        if(tab==='week')return(now-e.updatedAt)<=ONE_WEEK;
+        if(tab==='day')return(now-e.updatedAt)<=ONE_DAY;
+        return true;
+      });
+      entries.sort((a,b)=>b.score-a.score);
+      const top10 = entries.slice(0,10);
+      if(entries.length===0){el.innerHTML='<div class="rank-empty">'+(tab==='all'?'まだ記録がありません':'この期間の記録はありません')+'</div>';return;}
+      el.innerHTML='';
+      top10.forEach((entry,i)=>{
+        const row=document.createElement('div');
+        row.className='ranking-row';
+        const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.';
+        const isMe=entry.name===nickname&&entry.deviceId===DEVICE_ID;
+        row.innerHTML=
+          '<span class="rank-num '+rc+'">'+medal+'</span>'+
+          '<div class="rank-info">'+
+            '<div class="rank-name'+(isMe?' me':'')+'">'+entry.name+(isMe?' ◀ あなた':'')+'</div>'+
+            '<div class="rank-date">'+fmtDate(entry.updatedAt)+'</div>'+
+          '</div>'+
+          '<span class="rank-score">'+entry.score.toLocaleString()+'pt</span>';
+        el.appendChild(row);
+      });
+    } catch(e) {
+      el.innerHTML='<div class="rank-empty">読み込みに失敗しました</div>';
+    }
+  }
+
+  // バナーの表示状態を復元
+  document.getElementById('banner-month-label').textContent = getBannerMonthLabel();
+  if(localStorage.getItem('adgame_banner_hidden')==='1'){
+    document.getElementById('monthly-banner').style.display='none';
+    document.getElementById('show-banner-btn').style.display='block';
+  } else {
+    loadBannerRanking('month');
   }
 
   loadRanking('all');
